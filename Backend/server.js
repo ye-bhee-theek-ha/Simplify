@@ -1,20 +1,20 @@
 
 const dotenv = require("dotenv");
 const express = require("express");
-
-dotenv.config();
+const connectDB = require("./config/db");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
+
+dotenv.config();
+connectDB();
+app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send("API is running...")
 })
 
-
-app.get("/:page_num", (req, res) => {
-    page_num = req.params.page_num;
-    res.send(`page ${page_num} ...`);
-});
+app.use("/api/users", userRoutes)
 
 const PORT = process.env.PORT || 4000;
 
