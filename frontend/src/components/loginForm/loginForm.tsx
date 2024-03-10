@@ -9,23 +9,18 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { json } from "stream/consumers";
 
 const cilent_side_auth = () => {
   console.log("csa")
 }
 
-export function SignupForm() {
-  
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+export function LoginForm() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rePassword, setRePassword] = useState("");
-
+  
   const[error, SetError] = useState("");
   const[loading, SetLoading] = useState(false)
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,32 +58,10 @@ export function SignupForm() {
   return (
     <div className="max-w-sm w-full mx-auto rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-        Signup to Simplifly
+        Login to Simplifly
       </h2>
 
       <form className="my-5" onSubmit={handleSubmit}>
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-          <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
-            <Input 
-              id="firstname" 
-              placeholder="Ali" 
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </LabelInputContainer>
-          <LabelInputContainer>
-            <Label htmlFor="lastname">Last name</Label>
-            <Input
-             id="lastname"
-             placeholder="Abdullah"
-             type="text"
-             value={lastName}
-             onChange={(e) => setLastName(e.target.value)}
-            />
-          </LabelInputContainer>
-        </div>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
           <Input 
@@ -99,7 +72,7 @@ export function SignupForm() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className="mb-1">
           <Label htmlFor="password">Password</Label>
           <Input
             id="password"
@@ -109,21 +82,11 @@ export function SignupForm() {
             onChange={(e) => setPassword(e.target.value)} 
           />
         </LabelInputContainer>
-        <LabelInputContainer className="mb-1">
-          <Label htmlFor="password">Re-Enter Password</Label>
-          <Input
-            id="re-password"
-            placeholder="••••••••" 
-            type="password"
-            value={rePassword}
-            onChange={(e) => setRePassword(e.target.value)}
-          />
-        </LabelInputContainer>
         <p className="mb-3 flex text-xs font-normal justify-self-start mx-2">
-            Alerady have an account?
-            <Link to="/login"
+            Don't have an account?
+            <Link to="/signup"
                     className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1">
-                Login
+                Register
             </Link>
         </p>
 
@@ -131,11 +94,11 @@ export function SignupForm() {
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-          Sign up
+          Login
           <BottomGradient />
         </button>
 
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-5 h-[1px] w-full" />
+        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
           <button

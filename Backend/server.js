@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const express = require("express");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const { NotFound, errHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
 
@@ -15,6 +16,9 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/users", userRoutes)
+
+app.use(NotFound);
+app.use(errHandler);
 
 const PORT = process.env.PORT || 4000;
 

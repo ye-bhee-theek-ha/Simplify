@@ -1,14 +1,19 @@
-import { Label } from './components/ui/label';
 import { SignupForm } from "./components/SignupForm/SignupForm"
+import { LoginForm } from "./components/loginForm/loginForm"
 import './App.css';
 import Homescreen from './screens/Homescreen/Homescreen';
+import { Route, Routes } from 'react-router-dom';
+import NotFound from "./screens/NotFound/NotFound";
 
 function App() {
   return (
     <div className="App">
-      <div className="m-5">
-        <SignupForm></SignupForm>
-      </div>
+      <Routes>
+        <Route path='/' element={<Homescreen />} />
+        <Route path='/login' element={<LoginForm />} />
+        <Route path='/signup' element={<SignupForm />}/>
+        <Route path="*" element={<NotFound />}/>
+      </Routes>
     </div>
   );
 }

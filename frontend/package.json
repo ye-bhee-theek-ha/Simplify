@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "4.0.3",
   "private": true,
+  "proxy": "http://127.0.0.1:5000",
   "dependencies": {
     "@radix-ui/react-label": "^2.0.2",
     "@testing-library/jest-dom": "^5.17.0",
