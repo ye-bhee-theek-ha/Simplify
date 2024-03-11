@@ -13,22 +13,40 @@ import axios from "axios";
 import { Loading } from "../Loading/Loading";
 
 
-const cilent_side_auth = () => {
-  console.log("csa")
-}
-
 export function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
   const[error, SetError] = useState("");
-  const[loading, SetLoading] = useState(false)
+  const[loading, SetLoading] = useState(false);
+
+  const[loginAttempts, SetLoginAttempts] = useState(0)
+
+
+  const checkEmail = (email: string) => {
+    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if ( re.test(email) ) {
+        return true;
+    }
+    return false;
+  }
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
     e.preventDefault();
-    console.log("Form submitted");
-    cilent_side_auth()
+
+    if (!checkEmail(email)) {
+      SetError("Sorry, Your Email Seems to be Invalid.");
+      return false;
+    }
+    
+    if (password === "") {
+      SetError("Oops, you forgot to enter your Password.");
+      return false;
+    }
     
     try {
       const config = {
@@ -37,7 +55,7 @@ export function LoginForm() {
         }
       }
       SetLoading(true);
-
+  
       const { data } = await axios.post(
         "http://127.0.0.1:5000/api/users/login", 
         {
@@ -45,17 +63,41 @@ export function LoginForm() {
           "Password": password
         },
         config
-      )
-
-      console.log(data)
+      );
+  
+      console.log(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
       SetLoading(false);
+      SetError("");
+  
+    } catch (error: any) {
+      SetError(error.response.data.message);
+      SetLoading(false);
 
-    } catch (error: any) 
-    {
-      SetError(error.response.data.message)
+      SetLoginAttempts(loginAttempts + 1);
     }
+  };
 
+
+  const errMsg = ({error = " Wrong Email or Password."}) => {
+    return (
+      <div className="bg-red-100 border text-sm border-red-400 text-red-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
+        <span className="block sm:inline mx-1 font-semibold self-start">{error}</span>
+      </div>
+    );
+  };
+
+  
+  const showResetOption = () => {
+    return (
+      <p className="mb-3 flex text-xs font-normal justify-self-start mx-2">
+          Forgot Password?
+          <Link to="/reset"
+                  className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1">
+              Reset Here
+          </Link>
+      </p>
+    );
   };
 
 
@@ -64,8 +106,11 @@ export function LoginForm() {
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Login to Simplifly
       </h2>
-      {loading && <Loading/>}
+
       <form className="my-5" onSubmit={handleSubmit}>
+
+      {error && errMsg({error})}
+
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
           <Input 
@@ -84,9 +129,21 @@ export function LoginForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)} 
+            showIcon={true}
           />
         </LabelInputContainer>
-        <p className="mb-3 flex text-xs font-normal justify-self-start mx-2">
+
+        { loginAttempts >= 2 && showResetOption()}
+
+        <button
+          className=" mt-4 bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          type="submit"
+        >
+          Login
+          <BottomGradient />
+        </button>
+
+        <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
             Don't have an account?
             <Link to="/signup"
                     className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1">
@@ -94,15 +151,7 @@ export function LoginForm() {
             </Link>
         </p>
 
-        <button
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-          type="submit"
-        >
-          Login
-          <BottomGradient />
-        </button>
-
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-6 h-[1px] w-full" />
 
         <div className="flex flex-col space-y-4">
           <button
@@ -127,6 +176,9 @@ export function LoginForm() {
           </button>
         </div>
       </form>
+
+      {loading && <LoadingModal />}
+
     </div>
   );
 }
@@ -153,3 +205,15 @@ const LabelInputContainer = ({
     </div>
   );
 };
+
+
+const LoadingModal = () => {
+  return (
+    <div className="fixed inset-0 flex justify-center items-center backdrop-blur-lg">
+      <div className="dark:bg-black p-8 rounded-lg shadow-lg">
+        <Loading />
+      </div>
+    </div>
+  );
+};
+
