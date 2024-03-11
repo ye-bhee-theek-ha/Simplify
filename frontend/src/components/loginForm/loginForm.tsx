@@ -7,8 +7,11 @@ import {
   IconBrandGithub,
   IconBrandGoogle,
 } from "@tabler/icons-react";
+
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Loading } from "../Loading/Loading";
+
 
 const cilent_side_auth = () => {
   console.log("csa")
@@ -36,10 +39,10 @@ export function LoginForm() {
       SetLoading(true);
 
       const { data } = await axios.post(
-        "api/users/login", 
+        "http://127.0.0.1:5000/api/users/login", 
         {
-          email,
-          password
+          "Email" : email,
+          "Password": password
         },
         config
       )
@@ -47,6 +50,7 @@ export function LoginForm() {
       console.log(data)
       localStorage.setItem("userInfo", JSON.stringify(data));
       SetLoading(false);
+
     } catch (error: any) 
     {
       SetError(error.response.data.message)
@@ -60,7 +64,7 @@ export function LoginForm() {
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Login to Simplifly
       </h2>
-
+      {loading && <Loading/>}
       <form className="my-5" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>

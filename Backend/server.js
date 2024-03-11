@@ -7,6 +7,9 @@ const { NotFound, errHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
 
+var cors = require('cors')
+app.use(cors())
+
 dotenv.config();
 connectDB();
 app.use(express.json());

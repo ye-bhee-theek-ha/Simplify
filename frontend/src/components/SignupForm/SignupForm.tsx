@@ -55,6 +55,7 @@ export function SignupForm() {
     } catch (error: any) 
     {
       SetError(error.response.data.message)
+      SetLoading(false)
     }
 
   };
