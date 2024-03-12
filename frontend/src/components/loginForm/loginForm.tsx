@@ -92,7 +92,7 @@ export function LoginForm() {
     return (
       <p className="mb-3 flex text-xs font-normal justify-self-start mx-2">
           Forgot Password?
-          <Link to="/reset"
+          <Link to="/forgotPassword"
                   className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1">
               Reset Here
           </Link>

@@ -6,16 +6,13 @@ import { cn } from "../../utils/cn";
 import {
   IconBrandGithub,
   IconBrandGoogle,
-  IconEyeOff,
-  IconEye
 } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { json } from "stream/consumers";
+import { Loading } from "../Loading/Loading";
 
-const cilent_side_auth = () => {
-  console.log("csa")
-}
+
 
 export function SignupForm() {
   
@@ -30,9 +27,14 @@ export function SignupForm() {
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+   
     e.preventDefault();
-    console.log("Form submitted");
-    cilent_side_auth()
+
+    if (!(password === rePassword))
+    {
+      SetError("Passwords do not match");
+      return false;
+    }
     
     try {
       const config = {
@@ -43,10 +45,12 @@ export function SignupForm() {
       SetLoading(true);
 
       const { data } = await axios.post(
-        "api/users/login", 
+        "http://127.0.0.1:5000/api/users/register", 
         {
-          email,
-          password
+          FirstName: firstName,
+          LastName: lastName,
+          Email: email,
+          Password: password
         },
         config
       )
@@ -54,6 +58,8 @@ export function SignupForm() {
       console.log(data)
       localStorage.setItem("userInfo", JSON.stringify(data));
       SetLoading(false);
+      SetError("");
+
     } catch (error: any) 
     {
       SetError(error.response.data.message)
@@ -63,6 +69,14 @@ export function SignupForm() {
   };
 
 
+  const errMsg = ({error = " Wrong Email or Password."}) => {
+    return (
+      <div className="bg-red-100 border text-sm border-red-400 text-red-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
+        <span className="block sm:inline mx-1 font-semibold self-start">{error}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-sm w-full mx-auto rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -70,6 +84,9 @@ export function SignupForm() {
       </h2>
 
       <form className="my-5" onSubmit={handleSubmit}>
+
+        {error && errMsg({error})}
+
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>
             <Label htmlFor="firstname">First name</Label>
@@ -79,6 +96,7 @@ export function SignupForm() {
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              required= {true}
             />
           </LabelInputContainer>
           <LabelInputContainer>
@@ -89,6 +107,7 @@ export function SignupForm() {
              type="text"
              value={lastName}
              onChange={(e) => setLastName(e.target.value)}
+             required= {true}
             />
           </LabelInputContainer>
         </div>
@@ -100,6 +119,7 @@ export function SignupForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required= {true}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
@@ -111,6 +131,7 @@ export function SignupForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             showIcon = {true}
+            required= {true}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-1">
@@ -122,6 +143,7 @@ export function SignupForm() {
             value={rePassword}
             onChange={(e) => setRePassword(e.target.value)}
             showIcon = {true}
+            required= {true}
           />
         </LabelInputContainer>
     
@@ -166,6 +188,9 @@ export function SignupForm() {
           </button>
         </div>
       </form>
+
+      {loading && <LoadingModal />}
+
     </div>
   );
 }
@@ -189,6 +214,17 @@ const LabelInputContainer = ({
   return (
     <div className={cn("flex flex-col space-y-2 w-full", className)}>
       {children}
+    </div>
+  );
+};
+
+
+const LoadingModal = () => {
+  return (
+    <div className="fixed inset-0 flex justify-center items-center backdrop-blur-lg">
+      <div className="dark:bg-black p-8 rounded-lg shadow-lg">
+        <Loading />
+      </div>
     </div>
   );
 };
