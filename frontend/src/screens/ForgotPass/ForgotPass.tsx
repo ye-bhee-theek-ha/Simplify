@@ -32,12 +32,12 @@ export function ForgotPasswordForm() {
       const { data } = await axios.post(
         "http://127.0.0.1:5000/api/users/forgotPassword",
         {
-          email,
+          "Email": email,
         },
         config
       );
 
-      console.log(data);
+      console.log({data});
       setResetSent(true);
       setLoading(false);
       setError("");
@@ -74,7 +74,20 @@ export function ForgotPasswordForm() {
         {error && errMsg({ error })}
 
         {resetSent ? (
-          <p className="text-green-600">Reset link sent to your email.</p>
+          <>
+            <div className="bg-green-100 border text-sm border-green-400 text-green-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
+              <span className="block sm:inline mx-1 font-semibold self-start">Email sent</span>
+            </div>
+            <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
+            Proceed to
+            <Link
+              to="/login"
+              className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1"
+            >
+              Login
+            </Link>
+          </p>
+         </>
         ) : (
           <>
             <LabelInputContainer className="mb-4">
@@ -95,23 +108,25 @@ export function ForgotPasswordForm() {
               Reset Password
               <BottomGradient />
             </button>
+          
+
+            <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
+              Remembered Password?
+              <Link
+                to="/login"
+                className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1"
+              >
+                Login
+              </Link>
+            </p>
           </>
         )}
 
-        <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
-          Remembered Password?
-          <Link
-            to="/login"
-            className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1"
-          >
-            Login
-          </Link>
-        </p>
-
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-6 h-[1px] w-full" />
       </form>
-
+      
       {loading && <LoadingModal />}
+
     </div>
   );
 }

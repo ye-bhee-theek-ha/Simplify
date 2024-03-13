@@ -8,18 +8,29 @@ import axios from "axios";
 import { Loading } from "../../components/Loading/Loading";
 
 export function ResetPasswordForm() {
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [Repassword, setRePassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
+  const [passwordChanged, setpasswordChanged] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!checkEmail(email)) {
-      setError("Sorry, Your Email Seems to be Invalid.");
+    if (!(password === Repassword))
+    {
+      setError("Passwords do not match");
       return false;
     }
+
+    if (!checkPassword(password)) {
+      setError("Password must contain eight characters, one uppercase, lowercase and number");
+      return false;
+    }
+
+    //extract confirmationToken from the url
+    const urlParts = window.location.pathname.split('/');
+    const confirmationToken = urlParts[urlParts.length - 1];
 
     try {
       const config = {
@@ -30,15 +41,16 @@ export function ResetPasswordForm() {
       setLoading(true);
 
       const { data } = await axios.post(
-        "http://127.0.0.1:5000/api/users/reset-password",
+        "http://127.0.0.1:5000/api/users/resetPassword",
         {
-          email,
+          newPassword : password,
+          confirmationToken,
         },
         config
       );
 
       console.log(data);
-      setResetSent(true);
+      setpasswordChanged(true);
       setLoading(false);
       setError("");
     } catch (error: any) {
@@ -47,7 +59,7 @@ export function ResetPasswordForm() {
     }
   };
 
-  const errMsg = ({ error = " Wrong Email or Password." }) => {
+  const errMsg = ({ error = "something went wrong, try again" }) => {
     return (
       <div className="bg-red-100 border text-sm border-red-400 text-red-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
         <span className="block sm:inline mx-1 font-semibold self-start">{error}</span>
@@ -55,10 +67,10 @@ export function ResetPasswordForm() {
     );
   };
 
-  const checkEmail = (email: string) => {
-    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const checkPassword = (password: string) => {
+    const re = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$");
 
-    if (re.test(email)) {
+    if (re.test(password)) {
       return true;
     }
     return false;
@@ -73,40 +85,59 @@ export function ResetPasswordForm() {
       <form className="my-5" onSubmit={handleSubmit}>
         {error && errMsg({ error })}
 
-        {resetSent ? (
-          <p className="text-green-600">Reset link sent to your email.</p>
+        {passwordChanged ? (
+        <>
+          <div className="bg-green-100 border text-sm border-green-400 text-green-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
+            <span className="block sm:inline mx-1 font-semibold self-start">Password Successfully Changed</span>
+          </div>
+          <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
+           Proceed to
+           <Link
+             to="/login"
+             className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1"
+           >
+             Login
+           </Link>
+         </p>
+        </>
         ) : (
-          <>
-            <LabelInputContainer className="mb-4">
-              <Label htmlFor="email">Email Address</Label>
+        <>
+          <div className="flex flex-col space-y-2 md:space-y-0 mb-4">
+            <LabelInputContainer className="mb-3">
+              <Label htmlFor="password">Password</Label>
               <Input
-                id="email"
-                placeholder="myemail@gmail.com"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="password"
+                placeholder="••••••••" 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                showIcon = {true}
+                required= {true}
               />
             </LabelInputContainer>
+            <LabelInputContainer className="mb-3">
+              <Label htmlFor="password">Confirm Password</Label>
+              <Input
+                id="re-password"
+                placeholder="••••••••" 
+                type="password"
+                value={Repassword}
+                onChange={(e) => setRePassword(e.target.value)}
+                showIcon = {true}
+                required= {true}
+              />
+            </LabelInputContainer>  
+          </div>
 
-            <button
-              className=" mt-4 bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-              type="submit"
+          <button
+            className=" mt-4 bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+            type="submit"
             >
-              Reset Password
-              <BottomGradient />
-            </button>
-          </>
-        )}
-
-        <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
-          Remembered Password?
-          <Link
-            to="/login"
-            className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1"
-          >
-            Login
-          </Link>
-        </p>
+            Reset Password
+            <BottomGradient />
+          </button>
+        </>
+      )}
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-6 h-[1px] w-full" />
       </form>

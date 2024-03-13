@@ -1,7 +1,8 @@
 const User = require("../models/useModels")
+const bcrypt = require("bcryptjs")
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken");
-const sendConfirmationEmail = require("../middlewares/sendConfirmationEmail")
+const { sendConfirmationEmail, sendPasswordRecoveryEmail }  = require("../middlewares/sendEmail")
 
 const registerUser = asyncHandler (async (req, res) => {
 
@@ -22,7 +23,7 @@ const registerUser = asyncHandler (async (req, res) => {
 
     if (user) {
 
-        sendConfirmationEmail(user.Email, user.confirmationToken);
+        //sendConfirmationEmail(user.Email, user.confirmationToken);
 
         res.status(201).json({
             _id : user._id,
@@ -42,6 +43,7 @@ const registerUser = asyncHandler (async (req, res) => {
 
 const confirm = (async (req, res) => {
     const confirmationToken = req.params.confirmationToken;
+    const newconfirmationToken = generateToken();
 
     try {
         const user = await User.findOne({ confirmationToken });
@@ -52,6 +54,7 @@ const confirm = (async (req, res) => {
 
         // Update user's isConfirmed field
         user.isConfirmed = true;
+        user.confirmationToken = newconfirmationToken;
         await user.save();
 
         res.status(200).json({ message: "Email confirmed successfully" });
@@ -91,25 +94,21 @@ const loginUser = asyncHandler (async (req, res) => {
 })
 
 const forgotPassword = asyncHandler (async (req, res) => {
-    
-    //err here
+
     const { Email } = req.body;
 
-    console.log(Email)
+    console.log({Email})
 
     try {
-        const user = await User.findOne({ "Email" : Email });
+        const user = await User.findOne({ Email });
       
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
         }
-        
 
-        //or create another token??
         const verificationToken = user.confirmationToken;
-      
-        // Do something with the verification token
-        // For example, you can send it in the confirmation email
+
+        //sendPasswordRecoveryEmail(Email, verificationToken);
         
         res.status(200).json({ verificationToken });
       } catch (error) {
@@ -119,8 +118,34 @@ const forgotPassword = asyncHandler (async (req, res) => {
 
 })
 
-const resetPassword = asyncHandler (async (req, res) => {
-    console.log("resetPassword")
-})
+const resetPassword = asyncHandler ( async (req, res) => {
+    //add server side password checker
+    const { newPassword, confirmationToken } = req.body;
+
+    console.log(req.body);
+
+    const newconfirmationToken = generateToken();
+
+    try {
+        const user = await User.findOne({ confirmationToken });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+
+        // Update user's password
+        ////fix error Hashing twice
+        const salt = await bcrypt.genSalt(10);
+        user.Password = await bcrypt.hash(newPassword, salt);
+        user.confirmationToken = newconfirmationToken; // Reset confirmation token
+        await user.save();
+
+        res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 module.exports = { registerUser, loginUser , forgotPassword, resetPassword, confirm};
