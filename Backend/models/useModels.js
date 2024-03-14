@@ -48,8 +48,10 @@ UserSchema.pre("save", async function (next) {
         next()
     }
 
+    console.log(this.Password);
     const salt = await bcrypt.genSalt(10);
     this.Password = await bcrypt.hash(this.Password, salt);
+    console.log(this.Password);
 })
 
 UserSchema.methods.matchPassword = async function (enteredPassword) {

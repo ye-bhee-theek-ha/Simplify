@@ -134,9 +134,11 @@ const resetPassword = asyncHandler ( async (req, res) => {
         }
 
         // Update user's password
-        ////fix error Hashing twice
-        const salt = await bcrypt.genSalt(10);
-        user.Password = await bcrypt.hash(newPassword, salt);
+        // ////fix error Hashing twice
+        // const salt = await bcrypt.genSalt(10);
+        // user.Password = await bcrypt.hash(newPassword, salt);
+        
+        user.Password = newPassword;
         user.confirmationToken = newconfirmationToken; // Reset confirmation token
         await user.save();
 

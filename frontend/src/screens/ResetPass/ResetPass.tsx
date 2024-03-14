@@ -68,8 +68,9 @@ export function ResetPasswordForm() {
   };
 
   const checkPassword = (password: string) => {
-    const re = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$");
+    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
+    console.log(password);
     if (re.test(password)) {
       return true;
     }
