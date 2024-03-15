@@ -5,6 +5,7 @@ import { Menu, MenuItem } from "../ui/navbar-menu";
 import { cn } from "../../utils/cn";
 import { Title } from "../ui/title";
 import { Button } from "../button/button";
+import { BackgroundGradient } from "../ui/background-gradient";
 
 export function Navbar({ className }: { className?: string }) {
 
@@ -36,7 +37,12 @@ export function Navbar({ className }: { className?: string }) {
             </MenuItem>
         </div>
         <div className="self-center">
-            <Button displayName="Signup" />
+            <BackgroundGradient 
+                className=""
+                animate = {true}
+            >
+                <Button displayName="Signup" />
+            </BackgroundGradient>
         </div>
       </Menu>
     </div>
