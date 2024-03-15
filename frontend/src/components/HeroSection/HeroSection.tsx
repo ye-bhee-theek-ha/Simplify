@@ -1,7 +1,6 @@
 
 "use client";
 import React, { useState }  from "react";
-import PropTypes from 'prop-types';
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { cn } from "../../utils/cn";
 import { Link } from "react-router-dom";
@@ -33,7 +32,7 @@ React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
     {...props}
   >
     <section className="bg-white dark:bg-gray-900">
-        <div className="h-screen w-screen px-4 py-8 mx-auto lg:py-16 flex justify-center">
+        <div className="h-screen px-4 py-8 mx-auto lg:py-16 flex justify-center">
             <div className=" ps-9 place-self-center flex-row">
                 <div>
                     <h1 className="max-w-3xl mb-4 text-6xl md:text-start leading-none dark:text-white">{title}</h1>
@@ -52,7 +51,7 @@ React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
                     </Link> 
                 </div>
             </div>
-            <div className="hidden md:block align-self-md-center ">
+            <div className="hidden md:flex items-center ">
                 <img src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png" alt="mockup"/>
             </div>                
         </div>

@@ -72,3 +72,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ### `hygen component new --name NewComponentName`
 to create a new component
+
+
+### npx tsc --init

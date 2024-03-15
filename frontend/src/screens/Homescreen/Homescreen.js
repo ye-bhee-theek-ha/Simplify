@@ -1,6 +1,7 @@
 import react from "react";
 import {Navbar} from "../../components/navbar/navbar"
 import {HeroSection} from '../../components/HeroSection/HeroSection';
+import {KeyFeatures} from "../../components/KeyFeatures/KeyFeatures";
 
 function Homescreen() {
   return (
@@ -11,6 +12,8 @@ function Homescreen() {
       button1="Lern More"
       button2="Book Now"  
     />
+
+    <KeyFeatures/>
 
   </div>);
 };
