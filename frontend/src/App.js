@@ -6,6 +6,7 @@ import NotFound from "./screens/NotFound/NotFound";
 import Homescreen from './screens/Homescreen/Homescreen';
 import {ResetPasswordForm} from "./screens/ResetPass/ResetPass"
 import {ForgotPasswordForm} from "./screens/ForgotPass/ForgotPass"
+import {BrowseFlights} from "./screens/BrowseFlights/BrowseFlights"
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path='/signup' element={<SignupForm />}/>
         <Route path='/reset' element={<ResetPasswordForm />}/>
         <Route path='/forgotPassword' element={<ForgotPasswordForm />}/>
+        <Route path="/BrowseFlights" element={<BrowseFlights />}/>
         <Route path="*" element={<NotFound />}/>
       </Routes>
     </div>

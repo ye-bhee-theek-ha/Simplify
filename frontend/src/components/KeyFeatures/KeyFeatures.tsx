@@ -21,9 +21,10 @@ React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { displayName?: str
     )}
     {...props}
   >
-    <div className="max-w-8xl mx-auto px-8">
+    <div className="max-w-8xl mx-auto px-8 my-6">
     {/* bento grid(from grid-comp.tsx) -> hover effect{returns list} (from card-hover-effect.tsx) -> gridItems(from GridItems.tsx) -> calls base grid component from(grid-comp.tsx) */}
-    <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]" >
+    {/* height of rows and width changed here */}
+    <BentoGrid className=" bento-grid max-w-6xl mx-auto md:auto-rows-[17rem]" >
       <HoverEffect components={GridItems()} />
     </BentoGrid>
     </div>

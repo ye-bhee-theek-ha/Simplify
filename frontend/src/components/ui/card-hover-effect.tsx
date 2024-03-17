@@ -22,7 +22,7 @@ export const HoverEffect = ({
         <div
           key={idx}
           className={cn(
-            "relative group grid p-2 h-full w-full", component.className
+            "gridItemsWshadow relative group grid p-2 h-full w-full", component.className
             )}
           onMouseEnter={() => setHoveredIndex(idx)}
           onMouseLeave={() => setHoveredIndex(idx)}
