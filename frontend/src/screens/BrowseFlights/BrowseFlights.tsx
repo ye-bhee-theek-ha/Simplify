@@ -8,8 +8,17 @@ import axios from "axios";
 import { Loading } from "../../components/Loading/Loading";
 import BottomGradient from "../../components/ui/BottomGradient";
 
+export interface BrowseFlightsSmProps {
+  isSearched: boolean;
+  onSearch: (formData: any) => void;
+  onRefresh: () => void;
+}
 
-export function BrowseFlightsSm() {
+export const BrowseFlightsSm: React.FC<BrowseFlightsSmProps> = ({
+  isSearched,
+  onSearch,
+  onRefresh,
+}) => {
   const [OriginCity, SetOriginCity] = useState("");
   const [DestinationCity, SetDestinationCity] = useState("");
   const [DepartureTime, SetDepartureTime] = useState("");
@@ -18,66 +27,96 @@ export function BrowseFlightsSm() {
   const[error, SetError] = useState("");
   const[loading, SetLoading] = useState(false)
 
-  const handleSubmit = () =>
-  {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const formData = {
+      "OriginCity": OriginCity,
+      "DestinationCity": DestinationCity,
+      "DepartureTime": DepartureTime,
+    };
 
-  }
+    const jsonData = JSON.stringify(formData);
+
+    onSearch(jsonData); 
+  };
+
+  const handleRefresh = () => {
+    
+    onRefresh();
+  };
 
   return (
     <div>
-     <form onSubmit={handleSubmit} className=" mx-auto space-y-4">
-      <div className="grid grid-cols-3 mt-3 gap-4">
-        <div>
-          <Input
-            id="originCity"
-            type="text"
-            placeholder="Enter Origin City"
-            value={OriginCity}
-            onChange={(e) => SetOriginCity(e.target.value)}
-          />
+      <form onSubmit={handleSubmit} className=" mx-auto space-y-4">
+        <div className="grid grid-cols-3 mt-3 gap-4">
+          <div>
+            <Input
+              id="originCity"
+              type="text"
+              placeholder="Enter Origin City"
+              value={OriginCity}
+              onChange={(e) => SetOriginCity(e.target.value)}
+            />
+          </div>
+          <div>
+            <Input
+              id="destinationCity"
+              type="text"
+              placeholder="Enter Destination City"
+              value={DestinationCity}
+              onChange={(e) => SetDestinationCity(e.target.value)}
+            />
+          </div>
+          <div>
+            <Input
+              id="departureTime"
+              type="text"
+              placeholder="Enter Departure Time"
+              value={DepartureTime}
+              onChange={(e) => SetDepartureTime(e.target.value)}
+            />
+          </div>
         </div>
-        <div>
-          <Input
-            id="destinationCity"
-            type="text"
-            placeholder="Enter Destination City"
-            value={DestinationCity}
-            onChange={(e) => SetDestinationCity(e.target.value)}
-          />
+      
+        <div className="grid grid-cols-3 gap-4 p-4 px-8">
+          <div>
+            <Link
+              to="/BrowseFlights"
+            >
+              <button
+                className="w-full h-10 p-[2px] rounded-md bg-gray-200 relative group/btn"
+              >
+                <div className="absolute inset-0 bg-grey w-full text-white rounded-md" />
+                <div className="flex items-center justify-center w-full h-full bg-neutral-100 rounded-md relative group transition duration-200 text-black hover:bg-transparent font-medium">
+                  More Options
+                </div>
+              </button>
+            </Link>
+          </div>
+          <div>
+            <button
+              className="w-full h-10 p-[2px] rounded-md bg-gray-200 relative group/btn"
+              onClick={handleRefresh}
+              type="button"
+            >
+              <div className="absolute inset-0 bg-grey w-full text-white rounded-md" />
+              <div className="flex items-center justify-center w-full h-full bg-neutral-100 rounded-md relative group transition duration-200 text-black hover:bg-transparent font-medium">
+                Refresh
+              </div>
+            </button>
+          </div>
+          <div>
+            <button
+              className=" bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+              type="submit"
+            >
+              Search Flights
+              <BottomGradient />
+            </button>
+          </div>
         </div>
-        <div>
-          <Input
-            id="departureTime"
-            type="text"
-            placeholder="Enter Departure Time"
-            value={DepartureTime}
-            onChange={(e) => SetDepartureTime(e.target.value)}
-          />
-        </div>
-      </div>
-    </form>
-      <div className="grid grid-cols-2 gap-4 p-4">
-        <div>
-          <Link
-            to="/BrowseFlights"
-            className=" flex justify-center border-2 border-gray bg-neutral-100 w-full text-black rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-          >
-            <div className="self-center justify-center text-center">
-              More options
-            </div>
-            <BottomGradient />
-          </Link>
-        </div>
-        <div>
-          <button
-            className=" bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-            type="submit"
-          >
-            Search Flights
-            <BottomGradient />
-          </button>
-        </div>
-      </div>
+      </form>
     </div>
   );
 }

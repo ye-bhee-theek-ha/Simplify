@@ -1,22 +1,126 @@
 //returns a list of components
 
-
+import axios from "axios";
 import { cn } from "../../utils/cn";
-import React from "react";
+import React, { useState } from "react";
 import { BentoGridItem } from "../ui/grid-comp";
+import classNames from "classnames";
+import { motion } from "framer-motion";
+import { BrowseFlights, BrowseFlightsSm } from "../../screens/BrowseFlights/BrowseFlights";
+import { Loading } from "../Loading/Loading";
+import { DisplayFlightsSm } from "../DisplayList/DisplayList";
+
 import {
   IconPlaneDeparture,
   IconUsersGroup,
   IconMessage2,
   IconMapSearch,
 } from "@tabler/icons-react";
-import classNames from "classnames";
-import { motion } from "framer-motion";
-import { BrowseFlights, BrowseFlightsSm } from "../../screens/BrowseFlights/BrowseFlights";
 
 export function GridItems() {
+
+  const [IsSearched, setIsSearched] = useState(false);
+  const[error, SetError] = useState("");
+  const[loading, SetLoading] = useState(false);
+
+  const [Type, SetType] = useState("") //show title or not
+
+  const [FlightData, SetFlightData] = useState([])
+
+  // handle Search Button Click
+  const handleSearchButtonClick = async (jsonData: any) => {
+    setIsSearched(true);
+    SetType("list");
+    SetLoading(true);
+
+    console.log("Search Button Clicked")
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json"
+        }
+      }
+      SetLoading(true);
+  
+      const { data } = await axios.post(
+        "http://127.0.0.1:5000/api/flights/getflights", 
+        {
+         
+        },
+        config
+      );
+
+      SetFlightData(data)
+
+      SetLoading(false);
+      SetError("");
+
+    } catch (error: any) {
+      SetError(error.response.data.message);
+      SetLoading(false);
+    }
+  };
+
+  const handleRefreshButtonClick = () => {
+
+    SetLoading(true);
+
+    //post request here
+    console.log("refreshed")
+  };
+
+  const errMsg = ({error = "Something wrong on our End."}) => {
+    return (
+      <div className="bg-red-100 border text-sm border-red-400 text-red-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
+        <span className="block sm:inline mx-1 font-semibold self-start">{error}</span>
+      </div>
+    );
+  };
+
+  console.log(FlightData)
+  const items = [
+    {
+      title: "Search",
+      description: "Search for flights to anywhere in the world",
+      header: <Browse 
+        isSearched={IsSearched}
+        onSearch={handleSearchButtonClick}
+        onRefresh={handleRefreshButtonClick}
+      />,
+      className: "md:col-span-2",
+      icon: <IconMapSearch className="icon h-4 w-4 text-neutral-500" />,
+    },
+    { 
+      Type : Type,
+      title: "Flights today",
+      description: "Find flights leaving today.",
+      header: <DisplayFlightsSm
+        Isloading = {loading}
+        data = {FlightData}
+      />,
+      className: "md:col-span-1",
+      icon: <IconPlaneDeparture className="h-4 w-4 text-neutral-500" />,
+      changeable: true,
+    },
+    {
+      title: "Contact us",
+      description: "Feel free to reach out to us if you have any queries.",
+      header: <Chatwithus />,
+      className: "md:col-span-1",
+      icon: <IconMessage2 className="h-4 w-4 text-neutral-500" />,
+    },
+    {
+      title: "About us",
+      header: <Skeleton />,
+      className: "md:col-span-2",
+      icon: <IconUsersGroup className="h-4 w-4 text-neutral-500" />,
+    },
+  ];
+  
   return items.map((item, i) => ({
         component: (<BentoGridItem
+          type={item.Type}
           key={i}
           title={item.title}
           description={item.description}
@@ -27,8 +131,6 @@ export function GridItems() {
         className: item.className
         }))
     };
-
-
 
 const Chatwithus = () => {
   const variants = {
@@ -60,7 +162,7 @@ const Chatwithus = () => {
     <motion.div
       initial="initial"
       whileHover="animate"
-      className="flex flex-1 w-full h-full min-h-[6rem] dark:bg-dot-white/[0.2] bg-dot-black/[0.2] flex-col space-y-2"
+      className="image/contentSkeleton flex flex-1 w-full h-full min-h-[6rem] dark:bg-dot-white/[0.2] bg-dot-black/[0.2] flex-col space-y-2"
     >
       <motion.div
         variants={variants}
@@ -87,22 +189,23 @@ const Chatwithus = () => {
   );
 };
 
-
-const Browse = () => {
-
+interface BrowseProps {
+  isSearched: boolean;
+  onSearch: (jsonData: any) => void;
+  onRefresh: () => void;
+}
+const Browse: React.FC<BrowseProps> = ({ isSearched, onSearch, onRefresh }) => 
+{
   return (
-    <BrowseFlightsSm/>
-  );
-};
-
-const DisplayFlights = () => {
-
-  return (
-    <div>
+    <div className="image/contentSkeleton">
+      <BrowseFlightsSm
+        isSearched={isSearched}
+        onSearch={(jsonData) => onSearch(jsonData)}
+        onRefresh={onRefresh}
+      />
     </div>
   );
 };
-
 
 const Skeleton = () => (
   <div className="image/contentSkeleton flex flex-1 w-full h-full min-h-[6rem] rounded-xl   dark:bg-dot-white/[0.2] bg-dot-black/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]  border border-transparent dark:border-white/[0.2] bg-neutral-100 dark:bg-black">
@@ -111,32 +214,5 @@ const Skeleton = () => (
     </div>
   </div>
 );
-const items = [
-  {
-    title: "Search",
-    description: "Serach for flights to your anywhere in the world",
-    header: <Browse />,
-    className: "md:col-span-2",
-    icon: <IconMapSearch className="icon h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "Departing Flights",
-    description: "Find flights leaving today.",
-    header: <DisplayFlights />,
-    className: "md:col-span-1",
-    icon: <IconPlaneDeparture className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "Contact us",
-    description: "feel free to reach out to us if you have any queries.",
-    header: <Chatwithus />,
-    className: "md:col-span-1",
-    icon: <IconMessage2 className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "About us",
-    header: <Skeleton />,
-    className: "md:col-span-2",
-    icon: <IconUsersGroup className="h-4 w-4 text-neutral-500" />,
-  },
-];
+
+
