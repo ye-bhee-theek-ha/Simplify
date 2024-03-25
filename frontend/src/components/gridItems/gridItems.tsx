@@ -4,7 +4,6 @@ import axios from "axios";
 import { cn } from "../../utils/cn";
 import React, { useState } from "react";
 import { BentoGridItem } from "../ui/grid-comp";
-import classNames from "classnames";
 import { motion } from "framer-motion";
 import { BrowseFlights, BrowseFlightsSm } from "../../screens/BrowseFlights/BrowseFlights";
 import { Loading } from "../Loading/Loading";
@@ -52,7 +51,7 @@ export function GridItems() {
       );
 
       SetFlightData(data)
-
+      
       SetLoading(false);
       SetError("");
 
@@ -194,6 +193,7 @@ interface BrowseProps {
   onSearch: (jsonData: any) => void;
   onRefresh: () => void;
 }
+
 const Browse: React.FC<BrowseProps> = ({ isSearched, onSearch, onRefresh }) => 
 {
   return (

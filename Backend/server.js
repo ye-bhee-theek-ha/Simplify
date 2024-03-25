@@ -4,6 +4,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const flightRoutes = require("./routes/flightRoutes")
+const airportRouts = require("./routes/airportRoutes")
 const { NotFound, errHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRoutes)
 app.use("/api/flights", flightRoutes)
+app.use("/api/airports", airportRouts)
 
 app.use(NotFound);
 app.use(errHandler);
