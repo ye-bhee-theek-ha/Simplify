@@ -23,8 +23,7 @@ export const BrowseFlightsSm: React.FC<BrowseFlightsSmProps> = ({
 }) => {
   const [OriginCity, SetOriginCity] = useState("");
   const [DestinationCity, SetDestinationCity] = useState("");
-  const [DepartureTime, SetDepartureTime] = useState("");
-  const [ArrivalTime, SetArrivalTime] = useState("");
+  const [Status, SetStatus] = useState("");
 
   const[error, SetError] = useState("");
   const[loading, SetLoading] = useState(false)
@@ -33,9 +32,9 @@ export const BrowseFlightsSm: React.FC<BrowseFlightsSmProps> = ({
     e.preventDefault();
     
     const formData = {
-      "OriginCity": OriginCity,
-      "DestinationCity": DestinationCity,
-      "DepartureTime": DepartureTime,
+      "departureCity": OriginCity,
+      "destinationCity": DestinationCity,
+      "status": Status,
     };
 
     const jsonData = JSON.stringify(formData);
@@ -44,6 +43,9 @@ export const BrowseFlightsSm: React.FC<BrowseFlightsSmProps> = ({
   };
 
   const handleRefresh = () => {
+    SetOriginCity("");
+    SetDestinationCity("");
+    SetStatus("");
     
     onRefresh();
   };
@@ -72,11 +74,11 @@ export const BrowseFlightsSm: React.FC<BrowseFlightsSmProps> = ({
           </div>
           <div>
             <Input
-              id="departureTime"
+              id="Status"
               type="text"
-              placeholder="Enter Departure Time"
-              value={DepartureTime}
-              onChange={(e) => SetDepartureTime(e.target.value)}
+              placeholder="Enter Flight Status"
+              value={Status}
+              onChange={(e) => SetStatus(e.target.value)}
             />
           </div>
         </div>
@@ -126,13 +128,13 @@ export const BrowseFlightsSm: React.FC<BrowseFlightsSmProps> = ({
 
 export function BrowseFlights() {
 
-  const [Airline, SetAirline] = useState(""); //return, one way
+  const [Airline, SetAirline] = useState("");
+  const [Airplane, SetAirplane] = useState(""); 
   const [OriginCity, SetOriginCity] = useState("");
   const [DestinationCity, SetDestinationCity] = useState("");
-  const [DepartureTime, SetDepartureTime] = useState("");
-  const [ArrivalTime, SetArrivalTime] = useState("");
-  const [Type, SetType] = useState(""); //return, one way
-  const [Class, SetClass] = useState(""); //economy buiseness first
+  const [DateFrom, SetDateFrom] = useState("");
+  const [DateTo, SetDateTo] = useState("");
+  const [price, SetPrice] = useState<number>();
 
   const[error, SetError] = useState("");
   const[loading, SetLoading] = useState(false)
@@ -150,11 +152,21 @@ export function BrowseFlights() {
 
     console.log("Search Button Clicked")
 
+    const flightType = label === "Both" ? "" : label;
+
     const formData = {
       "OriginCity": OriginCity,
       "DestinationCity": DestinationCity,
-      "DepartureTime": DepartureTime,
-    };
+      "dateFrom": DateFrom,
+      "dateTo": DateTo,
+      "maxPrice": price,
+      "status": status,
+      "flightType": flightType,
+      "Airline": Airline,
+      "Airplane": Airplane,
+      };
+
+    console.log(formData);
 
     const jsonData = JSON.stringify(formData);
 
@@ -167,10 +179,9 @@ export function BrowseFlights() {
       SetLoading(true);
   
       const { data } = await axios.post(
-        "http://127.0.0.1:5000/api/flights/getflights", 
-        {
-         
-        },
+        "http://127.0.0.1:5000/api/flights/getFilteredFlights", 
+        jsonData
+        ,
         config
       );
 
@@ -183,6 +194,37 @@ export function BrowseFlights() {
     } catch (error: any) {
       SetError(error.response.data.message);
       SetLoading(false);
+    }
+  };
+
+  //////////////////////////
+  const [label, setLabel] = useState("Both");
+
+  const handleLabelChange = () => {
+    if (label === "Both") {
+      setLabel("Domestic");
+    } else if (label === "Domestic") {
+      setLabel("International");
+    } else {
+      setLabel("Both");
+    }
+  };
+  ///////////////////////////
+  const [status, setStatus] = useState("Scheduled");
+
+  const handleStatusChange = () => {
+    if (status === "Scheduled") {
+      setStatus("Boarding");
+    } else if (status === "Boarding") {
+      setStatus("In-Flight");
+    } else if (status === "In-Flight") {
+      setStatus("Arrived");
+    } else if (status === "Arrived") {
+      setStatus("Delayed");
+    } else if (status === "Delayed") {
+      setStatus("Cancelled");
+    } else {
+      setStatus("Scheduled");
     }
   };
 
@@ -228,45 +270,61 @@ export function BrowseFlights() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Label htmlFor="departureTime">Departure Time</Label>
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="w-fit justify-self-center">
+            <Label htmlFor="Date From">Date From</Label>
             <Input
-              id="departureTime"
-              type="text"
-              placeholder="Enter Departure Time"
-              value={DepartureTime}
-              onChange={(e) => SetDepartureTime(e.target.value)}
+              id="Date From"
+              type="Date"
+              placeholder="Enter Date From"
+              value={DateFrom}
+              onChange={(e) => SetDateFrom(e.target.value)}
             />
           </div>
-          <div>
-            <Label htmlFor="arrivalTime">Arrival Time</Label>
+
+          <div className="w-fit justify-self-center">
+            <Label htmlFor="Date to">Date To</Label>
             <Input
-              id="arrivalTime"
+              id="Date to"
+              type="Date"
+              placeholder="Enter Date to"
+              value={DateTo}
+              onChange={(e) => SetDateTo(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="Airplane Model">Airplane</Label>
+            <Input
+              id="Plane Model"
               type="text"
-              placeholder="Enter Arrival Time"
-              value={ArrivalTime}
-              onChange={(e) => SetArrivalTime(e.target.value)}
+              placeholder="Enter airplane"
+              value={Airplane}
+              onChange={(e) => SetAirline(e.target.value)}
+            />
+          </div>
+
+          <div className="w-fit justify-self-center">
+            <Label htmlFor="price">Price</Label>
+            <Input
+              id="price"
+              type="number"
+              placeholder="Enter price range"
+              value={price}
+              onChange={(e) => SetPrice(parseInt(e.target.value))}
             />
           </div>  
-          <div>
-            <div>
-              <Label htmlFor="type">Type</Label>
-              <select
-                id="type"
-                value={Type}
-                onChange={(e) => SetType(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="class">Class</Label>
-              <select
-                id="class"
-                value={Class}
-                onChange={(e) => SetClass(e.target.value)}
-              />
-            </div>
+
+          <div className="w-fit justify-self-center col-span-1 md:col-span-2 lg:col-span-1">
+            <Label htmlFor="label">Flight Type</Label>
+            <Btn text={label} onClick={handleLabelChange} />
           </div>
+
+          <div className="w-fit justify-self-center col-span-1 md:col-span-2 lg:col-span-1">
+            <Label htmlFor="Status">Flight Status</Label>
+            <Btn text={status} onClick={handleStatusChange} />
+          </div>
+
         </div>
 
         <div className="grid grid-cols-2 gap-4 p-5">
@@ -292,8 +350,8 @@ export function BrowseFlights() {
       </form>
     </div> 
     <div className="flex flex-row">
-      <div className="w-56 my-14 px-5 mx-5 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-start hidden lg:flex ">
-      my-14 px-5 mx-10 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center
+      <div className="min-w-56 w-56 my-14 px-5 mx-5 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-start hidden xl:flex">
+            my-14 px-5 mx-10 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center
       </div>
       <div className="flex flex-1 my-14 px-5 mx-5 mr-10 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center">
         {error && <DisplayError error = {error} />}
@@ -331,5 +389,21 @@ const LabelInputContainer = ({
       <div className={cn("flex flex-col space-y-2 w-full", className)}>
         {children}
       </div>
+    );
+  };
+
+
+  const Btn = ({ text, onClick }: { text: string; onClick: () => void }) => {
+    return (
+      <span
+        className="flex h-10 w-full border-none bg-gray-50 dark:bg-zinc-800 dark:text-white shadow-input rounded-md px-3 py-2
+        placeholder:text-neutral-400 dark:placeholder-text-neutral-600 focus-visible:outline-none focus-visible:ring-[2px] 
+        focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600 disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-[0px_0px_1px_1px_var(--neutral-700)] group-hover/input:shadow-none transition duration-400
+        items-center text-lg font-medium text-gray-600 hover:ring-2 cursor-pointer self-end mt-1 justify-center"
+        onClick={onClick}
+        style={{ transition: "all 0.3s" }}
+      >
+        {text}
+      </span>
     );
   };

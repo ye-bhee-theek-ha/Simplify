@@ -7,6 +7,7 @@ import Homescreen from './screens/Homescreen/Homescreen';
 import {ResetPasswordForm} from "./screens/ResetPass/ResetPass"
 import {ForgotPasswordForm} from "./screens/ForgotPass/ForgotPass"
 import {BrowseFlights} from "./screens/BrowseFlights/BrowseFlights"
+import {FlightInfo} from "./screens/Flights/FlightInfo"
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path='/reset' element={<ResetPasswordForm />}/>
         <Route path='/forgotPassword' element={<ForgotPasswordForm />}/>
         <Route path="/BrowseFlights" element={<BrowseFlights />}/>
+        <Route path="/Flights/:FlightID" element={<FlightInfo />}/>
         <Route path="*" element={<NotFound />}/>
       </Routes>
     </div>

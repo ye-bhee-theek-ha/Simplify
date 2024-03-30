@@ -43,13 +43,12 @@ export function GridItems() {
       SetLoading(true);
   
       const { data } = await axios.post(
-        "http://127.0.0.1:5000/api/flights/getflights", 
-        {
-         
-        },
+        "http://127.0.0.1:5000/api/flights/getFilteredFlights", 
+         jsonData
+        ,
         config
       );
-
+        
       SetFlightData(data)
       
       SetLoading(false);
@@ -61,12 +60,39 @@ export function GridItems() {
     }
   };
 
-  const handleRefreshButtonClick = () => {
+  const handleRefreshButtonClick = async() => {
 
+    setIsSearched(true);
+    SetType("list");
     SetLoading(true);
 
-    //post request here
-    console.log("refreshed")
+    console.log("Search Button Clicked")
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json"
+        }
+      }
+      SetLoading(true);
+  
+      const { data } = await axios.post(
+        "http://127.0.0.1:5000/api/flights/getFilteredFlights", 
+        {
+
+        },
+        config
+      );
+        
+      SetFlightData(data)
+
+      SetLoading(false);
+      SetError("");
+
+    } catch (error: any) {
+      SetError(error.response.data.message);
+      SetLoading(false);
+    }
   };
 
   const errMsg = ({error = "Something wrong on our End."}) => {

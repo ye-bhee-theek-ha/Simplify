@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { cn } from "../../utils/cn";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -8,12 +8,19 @@ import BottomGradient from "../../components/ui/BottomGradient";
 
 import {
   IconCalendarClock,
+  IconTruckLoading,
+  IconPlaneOff,
+  IconClockExclamation,
+  IconPlaneInflight,
   IconTimeline,
   IconTag,
   IconPlaneArrival,
   IconPlaneDeparture,
   IconCoins,
-  IconPlaneTilt
+  IconCalendarMonth,
+  IconPlaneTilt,
+  IconMapPins,
+  IconWorld,
 } from "@tabler/icons-react";
 import { Button } from "../button/button";
 
@@ -106,24 +113,44 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
         destination: string;
         price: string | number;
         departureTime: string;
-        type: string
-        status: string
-        aircraft: string
+        date: Date;
+        type: string;
+        status: string;
+        Airplane: string;
+        Airline: string;
       }
     
-    const ListItem: React.FC<ListItemProps> = ({ departureCity, destination, price, departureTime, type, status, FlightId, aircraft }) => {
+    const ListItem: React.FC<ListItemProps> = ({ departureCity, destination, price, departureTime, date, type, status, FlightId, Airplane, Airline }) => {
+      
+      const parsedDate = new Date(date);
+      const isValidDate = !isNaN(parsedDate.getTime());
+      const formattedDate = isValidDate ? parsedDate.toLocaleDateString() : "";
+
       return (
-        <div className="p-4 rounded-lg shadow-md font-medium text-neutral-700 bg-gray-100 border px-4 py-4 flex mb-4 h-28 ">
+        <div className="p-4 rounded-lg shadow-md font-medium text-neutral-700 bg-gray-100 border px-4 py-4 flex mb-4 h-32"
+        style={{textWrap:"nowrap"}}
+        >
 
           <div className="flex flex-col items-center justify-between">
+
             <div className="flex flex-row items-center">
-              <IconCalendarClock className="h-4 w-4 text-sky-950" />
+              <StatusIcon
+                status={status}
+              />
               <h3 className="text-lg px-2 text-sky-900">{status}</h3>
             </div>
+            
+            <div className="w-full flex flex-row">
+              <div className="inline-flex items-center justify-start self-start">
+                <IconCalendarMonth className="h-4 w-4 text-neutral-500" />
+                <p className="text-sm text-neutral-600 px-1">{formattedDate}</p>
+              </div>
+            </div>
+            
             <div className="w-full flex flex-row">
               <div className="inline-flex items-center justify-start self-start">
                 <IconTimeline className="h-4 w-4 text-neutral-500" />
-                <p className="text-md px-1">{departureTime}</p>
+                <p className="text-sm px-1">{departureTime}</p>
               </div>
             </div>
           </div>
@@ -131,6 +158,10 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
           <div className="flex flex-1 flex-col items-center justify-between px-3 lg:px-6">
             <div className="w-full justify-around flex flex-row">
               <div className="flex items-center self-start mt-2 mx-2">
+                <IconPlaneTilt className="h-4 w-4 text-neutral-500" />
+                <h3 className="px-2 font-medium text-md">{Airline}</h3>
+              </div>
+              <div className="items-center self-start mt-2 mx-2 hidden md:flex">
                 <IconTag className="h-4 w-4 text-neutral-500" />
                 <p className="px-2 font-normal">{FlightId}</p>
               </div>
@@ -138,14 +169,20 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
                 <IconCoins className="h-4 w-4 text-neutral-500" />
                 <p className="px-2 font-normal">Rs. {price}</p>
               </div>
-              <Label
-                text={type}
-              />
-                
+              <div>
+                <Label
+                  text={type}
+                  className="hidden md:flex"
+                />
+                <Label
+                  text = {type == "Domestic" ? <IconMapPins className="h-4 w-4 text-neutral-500" /> : <IconWorld className="h-4 w-4 text-neutral-500" /> }
+                  className="flex md:hidden"
+                />
+              </div>
             </div>
-            <div className="mt-2 flex flex-row w-[100%] max-w-[28rem] min-w-[15rem] items-center">
+            <div className="mt-2 flex flex-row w-[100%] max-w-[28rem] min-w-[15rem] items-end">
               <p className="text-gray-500">{departureCity}</p>
-              <div className="w-full px-2 mb-5">
+              <div className="w-full px-2 mb-2">
                 <div className="w-full flex flex-row justify-between p-1">
                   <IconPlaneDeparture className="h-5 w-5 text-neutral-500 self-start" />
                   <IconPlaneArrival className="h-5 w-5 text-neutral-500 self-end" />
@@ -182,7 +219,9 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
                   type = {data.FlightType}
                   status = {data.Status}
                   departureTime={data.DepartureTime}
-                  aircraft={data.AirplaneModel}
+                  date={data.Date}
+                  Airplane={data.AirplaneModel}
+                  Airline="fly Emirates"
                 />
                 
               ))
@@ -193,7 +232,7 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
 }
 
 
-const Label = ({text, className}:{text:string, className?:string}) => {
+const Label = ({text, className}:{text:string | React.ReactNode, className?:string}) => {
   return(
     <span className={cn("inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1",
     className)}                 
@@ -203,6 +242,21 @@ const Label = ({text, className}:{text:string, className?:string}) => {
   )
 }
 
+const StatusIcon = ({ status }: { status: string }) => {
+
+  const statusIconMapping: { [key: string]: JSX.Element } = {
+    Scheduled: <IconCalendarClock className="h-4 w-4 text-sky-950" />,
+    Boarding: <IconTruckLoading className="h-4 w-4 text-sky-950" />,
+    'In-Flight': <IconPlaneInflight className="h-4 w-4 text-sky-950" />,
+    Arrived: <IconPlaneArrival className="h-4 w-4 text-sky-950" />,
+    Delayed: <IconClockExclamation className="h-4 w-4 text-sky-950" />,
+    Cancelled: <IconPlaneOff className="h-4 w-4 text-sky-950" />,
+  };
+
+  const icon = statusIconMapping[status];
+
+  return icon
+}
 
 const Nodata = () => {
   return (

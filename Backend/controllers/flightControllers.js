@@ -55,20 +55,28 @@ const getFlights = async (req, res) => {
 
 
 const getFilteredFlights = asyncHandler(async (req, res) => {
-    const { departureCity, destinationCity, dateFrom, dateTo, flightType, status, minPrice } = req.body;
+    const { departureCity, destinationCity, dateFrom, dateTo, flightType, status, maxPrice } = req.body;
     let filter = {};
 
     // Check if any fields exist and are not empty
     if (departureCity) filter.DepartureCity = { $regex: new RegExp(departureCity, "i") };
     if (destinationCity) filter.DestinationCity = { $regex: new RegExp(destinationCity, "i") };
-    if (dateFrom && dateTo) filter.Date = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+    if (dateFrom && dateTo) {
+        filter.Date = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+    } else if (dateFrom) {
+        filter.Date = { $gte: new Date(dateFrom) };
+    } else if (dateTo) {
+        filter.Date = { $lte: new Date(dateTo) };
+    }
     if (flightType) filter.FlightType = flightType;
     if (status) filter.Status = status;
-    if (minPrice) filter.$or = [
-        { FirstClassPrice: { $gte: minPrice } },
-        { BusinessClassPrice: { $gte: minPrice } },
-        { EconomyClassPrice: { $gte: minPrice } }
+    if (maxPrice) filter.$or = [
+        { FirstClassPrice: { $lte: maxPrice } },
+        { BusinessClassPrice: { $lte: maxPrice } },
+        { EconomyClassPrice: { $lte: maxPrice } }
     ];
+
+    console.log(filter);
 
     const flights = await Flight.find(filter);
 
@@ -92,10 +100,9 @@ const getFlightById = asyncHandler(async (req, res) => {
 
 
 const updateFlight = asyncHandler(async (req, res) => {
-
     const { FlightID } = req.params;
 
-    const flight = await Flight.findbyId(FlightID);
+    const flight = await Flight.findOne({ FlightID });
 
     if (!flight) {
         res.status(404);
@@ -116,22 +123,24 @@ const updateFlight = asyncHandler(async (req, res) => {
         Status,
     } = req.body;
 
-    flight.Date = Date;
-    flight.DepartureCity = DepartureCity;
-    flight.DestinationCity = DestinationCity;
-    flight.DepartureTime = DepartureTime;
-    flight.FlightDuration = FlightDuration;
-    flight.AirplaneModel = AirplaneModel;
-    flight.FlightType = FlightType;
-    flight.FirstClassPrice = FirstClassPrice;
-    flight.BusinessClassPrice = BusinessClassPrice;
-    flight.EconomyClassPrice = EconomyClassPrice;
-    flight.Status = Status;
+
+    if (Date) flight.Date = Date;
+    if (DepartureCity) flight.DepartureCity = DepartureCity;
+    if (DestinationCity) flight.DestinationCity = DestinationCity;
+    if (DepartureTime) flight.DepartureTime = DepartureTime;
+    if (FlightDuration) flight.FlightDuration = FlightDuration;
+    if (AirplaneModel) flight.AirplaneModel = AirplaneModel;
+    if (FlightType) flight.FlightType = FlightType;
+    if (FirstClassPrice) flight.FirstClassPrice = FirstClassPrice;
+    if (BusinessClassPrice) flight.BusinessClassPrice = BusinessClassPrice;
+    if (EconomyClassPrice) flight.EconomyClassPrice = EconomyClassPrice;
+    if (Status) flight.Status = Status;
 
     await flight.save();
 
     res.json(flight);
 });
+
 
 const deleteFlight = asyncHandler(async (req, res) => {
 
