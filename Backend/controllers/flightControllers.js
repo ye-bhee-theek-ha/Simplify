@@ -158,4 +158,36 @@ const deleteFlight = asyncHandler(async (req, res) => {
 });
 
 
+
+const bookSeat = async (req, res) => {
+    const { FlightID, row, col, seat_group } = req.body;
+
+    try {
+        const flight = await Flight.findOne({ FlightID });
+
+        if (!flight) {
+            res.status(404);
+            throw new Error("Flight not found");
+        }
+
+        // Check if the seat is already booked
+        const bookedSeatIndex = flight.BookedSeats.findIndex(seat => seat.row === row && seat.col === col && seat.seat_group === seat_group);
+        if (bookedSeatIndex !== -1) {
+            res.status(400);
+            throw new Error("Seat is already booked");
+        }
+
+        // Add the seat to the booked seats array
+        flight.BookedSeats.push({ row, col, seat_group });
+        await flight.save();
+
+        res.status(201).json({ message: "Seat booked successfully" });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
 module.exports = { createFlight, getFlights, getFlightById, getFilteredFlights, updateFlight, deleteFlight };

@@ -1,5 +1,35 @@
 const mongoose = require("mongoose");
 
+const SeatGroupSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    rows: {
+        type: Number,
+        required: true
+    },
+    cols: {
+        type: Number,
+        required: true
+    }
+});
+
+const BookedSeatSchema = mongoose.Schema({
+    row: {
+        type: String,
+        required: true
+    },
+    col: {
+        type: Number,
+        required: true
+    },
+    group_name: {
+        type: String,
+        required: true
+    }
+});
+
 const FlightSchema = mongoose.Schema(
     {
         FlightID: {
@@ -53,6 +83,8 @@ const FlightSchema = mongoose.Schema(
             enum: ["Scheduled", "Boarding", "In-Flight", "Arrived", "Delayed", "Cancelled"],
             default: "Scheduled",
         },
+        SeatGroups: [SeatGroupSchema], 
+        BookedSeats: [BookedSeatSchema],
     },
     {
         timestamps: true,

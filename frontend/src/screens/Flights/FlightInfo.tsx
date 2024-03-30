@@ -18,20 +18,24 @@ const seatGroups = [
   ];
 
 const bookedSeats = [
-{ row: "A", col: 3 },
-{ row: "B", col: 10 },
-{ row: "C", col: 2 },
+{ row: "A", col: 3, seat_group: "First Class" },
+{ row: "B", col: 10, seat_group: "Economy Class" },
+{ row: "C", col: 2, seat_group: "Business Class" },
 // Add more booked seats as needed
 ];
 
 
 export function FlightInfo() {
 
+    const [SelectedSeats, SetSelectedSeats] = useState<{ row: string; col: number; group_name: string; }[]>([]);
+
     return (
         <div className="h-screen w-[450px]">
             <Seat_Picker 
                 seatGroups={seatGroups}
                 BookedSeats={bookedSeats}
+                SelectedSeats={SelectedSeats}
+                SetSelectedSeats={SetSelectedSeats}
             />
         </div>
     )
