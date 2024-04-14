@@ -1,4 +1,4 @@
-const Flight = require("../models/flightData");
+const {Flight, BookedSeat, SeatGroup} = require('../models/flightData');
 const asyncHandler = require("express-async-handler");
 
 const createFlight = asyncHandler(async (req, res) => {
@@ -15,6 +15,8 @@ const createFlight = asyncHandler(async (req, res) => {
         BusinessClassPrice,
         EconomyClassPrice,
         Status,
+        SeatGroups,
+        BookedSeats,
     } = req.body;
 
     const flightExists = await Flight.findOne({ FlightID });
@@ -23,6 +25,18 @@ const createFlight = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Flight already exists");
     }
+
+    const seatGroupDocuments = await Promise.all(Object.values(SeatGroups).map(async (seatGroup) => {
+        const newSeatGroup = new SeatGroup({
+            name: seatGroup.name,
+            rows: seatGroup.rows,
+            cols: seatGroup.cols
+        });
+        return await newSeatGroup.save();
+    }));
+    
+    const seatGroupIds = seatGroupDocuments.map(seatGroup => seatGroup._id);
+
 
     const flight = await Flight.create({
         FlightID,
@@ -37,6 +51,8 @@ const createFlight = asyncHandler(async (req, res) => {
         BusinessClassPrice,
         EconomyClassPrice,
         Status,
+        SeatGroups: seatGroupIds,
+        BookedSeats,
     });
 
     res.status(201).json(flight);
@@ -85,10 +101,9 @@ const getFilteredFlights = asyncHandler(async (req, res) => {
 
 
 const getFlightById = asyncHandler(async (req, res) => {
-
     const { FlightID } = req.params;
 
-    const flight = await Flight.find({FlightID});
+    const flight = await Flight.findOne({ FlightID }).populate('SeatGroups').populate('BookedSeats');
 
     if (!flight) {
         res.status(404);
@@ -159,8 +174,8 @@ const deleteFlight = asyncHandler(async (req, res) => {
 
 
 
-const bookSeat = async (req, res) => {
-    const { FlightID, row, col, seat_group } = req.body;
+const bookSeats = async (req, res) => {
+    const { FlightID, seats } = req.body;
 
     try {
         const flight = await Flight.findOne({ FlightID });
@@ -170,18 +185,25 @@ const bookSeat = async (req, res) => {
             throw new Error("Flight not found");
         }
 
-        // Check if the seat is already booked
-        const bookedSeatIndex = flight.BookedSeats.findIndex(seat => seat.row === row && seat.col === col && seat.seat_group === seat_group);
-        if (bookedSeatIndex !== -1) {
-            res.status(400);
-            throw new Error("Seat is already booked");
+        // Iterate through each seat in the array
+        for (const seat of seats) {
+            const { row, col, seat_group } = seat;
+
+            // Check if the seat is already booked
+            const isBooked = flight.BookedSeats.some(bookedSeat => bookedSeat.row === row && bookedSeat.col === col && bookedSeat.seat_group === seat_group);
+            if (isBooked) {
+                res.status(400);
+                throw new Error(`Seat (${row}, ${col}) in ${seat_group} is already booked`);
+            }
+
+            // Add the seat to the booked seats array
+            flight.BookedSeats.push({ row, col, seat_group });
         }
 
-        // Add the seat to the booked seats array
-        flight.BookedSeats.push({ row, col, seat_group });
+        // Save the updated flight document
         await flight.save();
 
-        res.status(201).json({ message: "Seat booked successfully" });
+        res.status(201).json({ message: "Seats booked successfully" });
     } catch (error) {
         console.error('Error:', error.message);
         res.status(500).json({ message: 'Internal server error' });
@@ -190,4 +212,4 @@ const bookSeat = async (req, res) => {
 
 
 
-module.exports = { createFlight, getFlights, getFlightById, getFilteredFlights, updateFlight, deleteFlight };
+module.exports = { createFlight, getFlights, getFlightById, getFilteredFlights, updateFlight, deleteFlight, bookSeats };

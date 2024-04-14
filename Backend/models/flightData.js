@@ -83,8 +83,14 @@ const FlightSchema = mongoose.Schema(
             enum: ["Scheduled", "Boarding", "In-Flight", "Arrived", "Delayed", "Cancelled"],
             default: "Scheduled",
         },
-        SeatGroups: [SeatGroupSchema], 
-        BookedSeats: [BookedSeatSchema],
+        SeatGroups: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'SeatGroup'
+        }],  
+        BookedSeats: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'BookedSeat'
+        }],    
     },
     {
         timestamps: true,
@@ -92,4 +98,7 @@ const FlightSchema = mongoose.Schema(
 );
 
 const Flight = mongoose.model("Flight", FlightSchema);
-module.exports = Flight;
+const BookedSeat = mongoose.model("BookedSeat", BookedSeatSchema);
+const SeatGroup = mongoose.model("SeatGroup", SeatGroupSchema);
+
+module.exports = {Flight, BookedSeat, SeatGroup};

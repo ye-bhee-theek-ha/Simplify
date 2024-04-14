@@ -8,6 +8,7 @@ import {ResetPasswordForm} from "./screens/ResetPass/ResetPass"
 import {ForgotPasswordForm} from "./screens/ForgotPass/ForgotPass"
 import {BrowseFlights} from "./screens/BrowseFlights/BrowseFlights"
 import {FlightInfo} from "./screens/Flights/FlightInfo"
+import {RegisterFlight} from "./screens/RegisterFlight/RegisterFlight"
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path='/forgotPassword' element={<ForgotPasswordForm />}/>
         <Route path="/BrowseFlights" element={<BrowseFlights />}/>
         <Route path="/Flights/:FlightID" element={<FlightInfo />}/>
+        <Route path="/RegisterFlight/:SellerID" element={<RegisterFlight />}/>
         <Route path="*" element={<NotFound />}/>
       </Routes>
     </div>

@@ -53,70 +53,121 @@ export function Seat_Picker({ className, seatGroups, BookedSeats, SelectedSeats,
     };
 
     return (
-        <div className="relative seat-picker h-full flex">
+      <div className={cn("relative seat-picker h-full flex", className)}>
         <PlaneIcon className="absolute -z-10" />
-        <div className="inset-0 flex flex-col items-center h-1/2 overflow-auto self-end w-full [mask-image:linear-gradient(transparent,white_10%,white_100%,transparent)]"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        <div
+          className="inset-0 flex flex-col items-center h-[50%] overflow-auto self-end w-full [mask-image:linear-gradient(transparent,white_10%,white_100%,transparent)]"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-            {seatGroups.map((group, index) => (
-            <div key={index} className="w-full seat-group my-4 px-4 mt-6 flex flex-col items-center">
-                <div className="font-semibold text-xl text-zinc-700">
-                    {group.name}
-                </div>
-                {[...Array(group.rows)].map((_, i) => (
-                <div key={i} className="w-full seat-row flex flex-row justify-between mt-4">
-
-                    <div className="w-full seat-group-left flex flex-row justify-evenly">
+          {seatGroups.map((group, index) => (
+            <div
+              key={index}
+              className="w-full seat-group my-4 px-4 mt-6 flex flex-col items-center"
+            >
+              <div className="font-semibold text-xl text-zinc-700">
+                {group.name}
+              </div>
+              {[...Array(group.rows)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-full seat-row flex flex-row justify-between mt-4"
+                >
+                  <div className="w-full seat-group-left flex flex-row justify-evenly">
                     {[...Array(Math.ceil(group.cols / 2))].map((_, j) => (
-                        <div
+                      <div
                         key={j + 1}
-                        className={cn("seat flex seat h-12 w-8 rounded-md text-neutral-200 items-center justify-center bg-zinc-500 hover:bg-zinc-600", {
-                            "bg-red-500 hover:bg-red-500": isSeatBooked(String.fromCharCode(65 + i), j+1, group.name)},
-                            {
-                            "ring-4": isSeatSelected(String.fromCharCode(65 + i), j+1, group.name)
-                            })}
+                        className={cn(
+                          "seat flex seat h-12 w-8 rounded-md text-neutral-200 items-center justify-center bg-zinc-500 hover:bg-zinc-600",
+                          {
+                            "bg-red-500 hover:bg-red-500": isSeatBooked(
+                              String.fromCharCode(65 + i),
+                              j + 1,
+                              group.name
+                            ),
+                          },
+                          {
+                            "ring-4": isSeatSelected(
+                              String.fromCharCode(65 + i),
+                              j + 1,
+                              group.name
+                            ),
+                          }
+                        )}
                         onClick={() => {
-                            if (!isSeatBooked(String.fromCharCode(65 + i), j+1, group.name)) {
-                                handleSeatClick(String.fromCharCode(65 + i), j + 1, group.name)}
-                            }
-                        }
-                        >
+                          if (
+                            !isSeatBooked(
+                              String.fromCharCode(65 + i),
+                              j + 1,
+                              group.name
+                            )
+                          ) {
+                            handleSeatClick(
+                              String.fromCharCode(65 + i),
+                              j + 1,
+                              group.name
+                            );
+                          }
+                        }}
+                      >
                         {j + 1}
-                        </div>
+                      </div>
                     ))}
-                    </div>
+                  </div>
 
-                    <div className={`text-center text-lg font-medium text-zinc-700 content-center w-12 row ${String.fromCharCode(65 + i)}`}>
-                        {String.fromCharCode(65 + i)}
-                    </div>
+                  <div
+                    className={`text-center text-lg font-medium text-zinc-700 content-center w-12 row ${String.fromCharCode(
+                      65 + i
+                    )}`}
+                  >
+                    {String.fromCharCode(65 + i)}
+                  </div>
 
-                    <div className="w-full seat-group-right flex flex-row justify-evenly">
-                        {[...Array(Math.floor(group.cols / 2))].map((_, k) => (
-                            <div
-                            key={k + 1}
-                            className={cn("seat flex seat h-12 w-8 rounded-md text-neutral-200 items-center justify-center bg-zinc-500 hover:bg-zinc-600", {
-                                    "bg-red-500 hover:bg-red-500": isSeatBooked(String.fromCharCode(65 + i), group.cols / 2 + k + 1, group.name)
-                                },
-                                {
-                                    "ring-4": isSeatSelected(String.fromCharCode(65 + i), group.cols / 2 + k + 1, group.name)
-                                })}
-                            onClick={() => {
-                                if (!isSeatBooked(String.fromCharCode(65 + i), group.cols / 2 + k + 1, group.name)) {
-                                    handleSeatClick(String.fromCharCode(65 + i), Math.ceil(group.cols / 2) + k + 1, group.name);
-                                }
-                                }
-                            }
-                            >
-                            {(group.cols / 2) + k + 1}
-                            </div>
-                        ))}
-                    </div>
-
+                  <div className="w-full seat-group-right flex flex-row justify-evenly">
+                    {[...Array(Math.floor(group.cols / 2))].map((_, k) => (
+                      <div
+                        key={k + 1}
+                        className={cn(
+                          "seat flex seat h-12 w-8 rounded-md text-neutral-200 items-center justify-center bg-zinc-500 hover:bg-zinc-600",
+                          {
+                            "bg-red-500 hover:bg-red-500": isSeatBooked(
+                              String.fromCharCode(65 + i),
+                              group.cols / 2 + k + 1,
+                              group.name
+                            ),
+                          },
+                          {
+                            "ring-4": isSeatSelected(
+                              String.fromCharCode(65 + i),
+                              group.cols / 2 + k + 1,
+                              group.name
+                            ),
+                          }
+                        )}
+                        onClick={() => {
+                          if (
+                            !isSeatBooked(
+                              String.fromCharCode(65 + i),
+                              group.cols / 2 + k + 1,
+                              group.name
+                            )
+                          ) {
+                            handleSeatClick(
+                              String.fromCharCode(65 + i),
+                              Math.ceil(group.cols / 2) + k + 1,
+                              group.name
+                            );
+                          }
+                        }}
+                      >
+                        {group.cols / 2 + k + 1}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                ))}
+              ))}
             </div>
-            ))}
+          ))}
         </div>
-    </div>
-  );
+      </div>
+    );
 }

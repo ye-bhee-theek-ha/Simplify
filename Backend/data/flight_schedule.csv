@@ -1,11 +1,3 @@
-FlightID,Date,DepartureCity,DestinationCity,DepartureTime,FlightDuration,AirplaneModel,FlightType,FirstClassPrice,BusinessClassPrice,EconomyClassPrice,Status
-FL001,2024-03-23,Lahore,Karachi,08:00,1.5,G-1000,Domestic,15000,12000,8000,Scheduled
-FL002,2024-03-23,Lahore,Dubai,10:00,3,B-2000,International,60000,45000,30000,Scheduled
-FL003,2024-03-23,Dubai,Lahore,13:00,3,B-2000,International,65000,50000,35000,Scheduled
-FL004,2024-03-23,Karachi,Lahore,16:00,1.5,G-1000,Domestic,18000,15000,10000,Scheduled
-FL005,2024-03-23,Lahore,New York,18:00,14,A-3000,International,150000,120000,80000,Scheduled
-FL006,2024-03-23,Lahore,London,20:00,8,B-2000,International,100000,80000,50000,Scheduled
-FL007,2024-03-23,London,Lahore,23:00,8,B-2000,International,120000,95000,60000,Scheduled
-FL008,2024-03-23,Lahore,Delhi,02:00,1.5,G-1000,Domestic,20000,15000,10000,Scheduled
-FL009,2024-03-23,Delhi,Lahore,05:00,1.5,G-1000,Domestic,22000,17000,12000,Scheduled
-FL010,2024-03-23,Lahore,Tokyo,07:00,9,B-2000,International,140000,110000,70000,Scheduled
+FlightID,Date,DepartureCity,DestinationCity,DepartureTime,FlightDuration,AirplaneModel,FlightType,FirstClassPrice,BusinessClassPrice,EconomyClassPrice,Status,SeatGroups,BookedSeats
+FL123,2024-04-01,New York,London,08:00,8,Boeing 747,International,1500,1000,500,Scheduled,"[{""name"":""Business Class"",""rows"":10,""cols"":6},{""name"":""Economy Class"",""rows"":20,""cols"":10},{""name"":""First Class"",""rows"":5,""cols"":8}]", "[{""row"":""A"",""col"":3,""group_name"":""First Class""},{""row"":""B"",""col"":10,""group_name"":""Economy Class""},{""row"":""C"",""col"":2,""group_name"":""Business Class""}]"
+FL124,2024-04-02,London,Paris,10:00,2,Boeing 737,International,1200,800,400,Scheduled,"[{""name"":""Business Class"",""rows"":8,""cols"":4},{""name"":""Economy Class"",""rows"":16,""cols"":8},{""name"":""First Class"",""rows"":4,""cols"":6}]", "[{""row"":""A"",""col"":1,""group_name"":""First Class""},{""row"":""B"",""col"":5,""group_name"":""Economy Class""},{""row"":""C"",""col"":3,""group_name"":""Business Class""}]"

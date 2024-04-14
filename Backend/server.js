@@ -7,6 +7,10 @@ const flightRoutes = require("./routes/flightRoutes")
 const airportRouts = require("./routes/airportRoutes")
 const { NotFound, errHandler } = require("./middlewares/errorMiddleware");
 
+//const uploadToMongo = require('./utils/upload_to_mongo');
+
+
+
 const app = express();
 
 var cors = require('cors')

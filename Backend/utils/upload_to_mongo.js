@@ -10,6 +10,12 @@ async function uploadToMongo() {
         fs.createReadStream('C:/Users/Lenovo/Desktop/Simplify/Backend/data/flight_schedule.csv')
             .pipe(csv())
             .on('data', async (row) => {
+                // Extract seat group data from the row
+                const seatGroups = JSON.parse(row.SeatGroups);
+
+                // Extract booked seat data from the row
+                const bookedSeats = JSON.parse(row.BookedSeats);
+
                 // Create a new Flight object
                 const flight = new Flight({
                     FlightID: row.FlightID,
@@ -23,7 +29,9 @@ async function uploadToMongo() {
                     FirstClassPrice: parseFloat(row.FirstClassPrice),
                     BusinessClassPrice: parseFloat(row.BusinessClassPrice),
                     EconomyClassPrice: parseFloat(row.EconomyClassPrice),
-                    Status: row.Status
+                    Status: row.Status,
+                    SeatGroups: seatGroups,
+                    BookedSeats: bookedSeats
                 });
 
                 // Save the flight object to MongoDB
