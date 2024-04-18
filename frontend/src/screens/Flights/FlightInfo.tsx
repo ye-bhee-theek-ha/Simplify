@@ -12,6 +12,12 @@ import { DisplayFlights } from "../../components/DisplayList/DisplayList";
 import { Seat_Picker } from "../../components/SeatPicker/SeatPicker";
 import { Button } from "../../components/button/button";
 import {
+  IconClock,
+  IconTimeDuration0,
+  IconMapPinDown,
+  IconMapPinUp,
+  IconClick,
+  IconReceipt2,
   IconCalendarClock,
   IconTruckLoading,
   IconPlaneOff,
@@ -82,29 +88,64 @@ export function FlightInfo() {
         );
         setFlightData(response.data);
         setLoading(false);
-        console.log(flightData);
       } catch (error) {
         console.error("Error fetching flight data:", error);
         setLoading(false);
       }
     }
     fetchFlightData();
-  }, []);
+    console.log(flightData);
+  }, [FlightID]);
 
   if (!flightData) {
     if (loading) {
-      return <LoadingModal/>;
+      return <LoadingModal />;
     }
     return <div>Error: Flight data not found.</div>;
   } else if (!flightData.SeatGroups) {
     if (loading) {
-      return <LoadingModal/>;
+      return <LoadingModal />;
     }
     return <div>Error: Seat groups not found.</div>;
   }
 
   const seatGroupsArray = Object.values(flightData.SeatGroups);
   const BookedSeatsArray = Object.values(flightData.BookedSeats);
+
+  const totalCost = SelectedSeats.reduce((total, seat) => {
+    const seatGroup = seatGroupsArray.find((group) => group.name === seat.group_name);
+    if (seatGroup) {
+      switch (seat.group_name) {
+        case "Economy Class":
+          total += flightData.EconomyClassPrice;
+          break;
+        case "Business Class":
+          total += flightData.BusinessClassPrice;
+          break;
+        case "First Class":
+          total += flightData.FirstClassPrice;
+          break;
+        default:
+          break;
+      }
+    }
+    return total;
+  }, 0);
+
+  const getPriceByGroupName = (groupName: string): number => {
+    switch (groupName) {
+      case "Economy Class":
+        return flightData?.EconomyClassPrice || 0;
+      case "Business Class":
+        return flightData?.BusinessClassPrice || 0;
+      case "First Class":
+        return flightData?.FirstClassPrice || 0;
+      default:
+        return 0;
+    }
+  };
+
+  {console.log(SelectedSeats.length)}
 
   return (
     <div className="">
@@ -127,11 +168,177 @@ export function FlightInfo() {
             className="mx-6 pt-10 hover:pt-0 transform duration-700 hover:-translate-y-7"
           />
         </div>
+
+        <div className="flex flex-col flex-1 mt-12 mx-8 p-8 rounded-lg border-2 overflow-y-auto h-[31rem]">
+          {/* ------------------------------ */}
+          <div className="w-full flex flex-row justify-between mb-6">
+            <div className="inline-flex items-center justify-start self-start">
+              <Label className="text-xl font-bold text-sky-900">
+                {flightData.Status}
+              </Label>
+            </div>
+
+            <div className="inline-flex items-center justify-start self-start">
+              <IconTag className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">Flight ID:</Label>
+              <div className="mx-4 text-lg">{flightData.FlightID}</div>
+            </div>
+
+            <div className="inline-flex items-center justify-start self-start">
+              <IconPlaneTilt className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">Airplane:</Label>
+              <div className="mx-4 text-lg">{flightData.AirplaneModel}</div>
+            </div>
+          </div>
+          {/* ------------------------------ */}
+          <div className="w-full flex flex-row justify-between mb-6">
+            <div className="inline-flex items-center justify-start self-start">
+              <IconCalendarMonth className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">Date:</Label>
+              <div className="mx-4 text-lg">{formatDate(flightData.Date)}</div>
+            </div>
+
+            <div className="inline-flex items-center justify-start self-start">
+              <IconClock className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">Time:</Label>
+              <div className="mx-4 text-lg">{flightData.DepartureTime}</div>
+            </div>
+
+            <div className="inline-flex items-center justify-start self-start">
+              <IconTimeDuration0 className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">Duration:</Label>
+              <div className="mx-4 text-lg">{flightData.FlightDuration}</div>
+            </div>
+          </div>
+          {/* ----------------------------- */}
+          <div className="w-full flex flex-row justify-between mb-6">
+            <div className="inline-flex items-center justify-start self-start">
+              <IconMapPinUp className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">From:</Label>
+              <div className="mx-4 text-lg">{flightData.DepartureCity}</div>
+            </div>
+
+            <div className="inline-flex items-center justify-start self-start">
+              <IconMapPinDown className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">To:</Label>
+              <div className="mx-4 text-lg">{flightData.DestinationCity}</div>
+            </div>
+
+            <div className="inline-flex items-center justify-start self-start">
+              <IconPlaneInflight className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">Flight Type:</Label>
+              <div className="mx-4 text-lg">{flightData.FlightType}</div>
+            </div>
+          </div>
+          {/* ----------------------------- */}
+
+          <div className="flex flex-row">
+            <div>
+              <div className="inline-flex items-center justify-start self-center my-3">
+                <IconCoins className="h-5 w-5 text-neutral-500" />
+                <Label className="text-xl text-sky-900">Pricing</Label>
+              </div>
+              <div className="w-full flex flex-row justify-evenly mb-6 space-x-4">
+                <div className="items-center justify-center border-2 rounded-lg flex flex-col flex-wrap content-center min-w-32 text-center">
+                  <Label className="text-lg text-neutral-700 py-2 px-0 text-center w-full">
+                    Economy
+                  </Label>
+                  <div className="w-full h-[2px] bg-[#e5e7eb]" />
+                  <Label className="text-lg font-normal text-neutral-700 py-3 px-0 text-center w-full">
+                    {flightData.EconomyClassPrice} pkr
+                  </Label>
+                </div>
+
+                <div className="items-center justify-center border-2 rounded-lg flex flex-col flex-wrap content-center min-w-32 text-center">
+                  <Label className="text-lg text-neutral-700 py-2 px-0 text-center w-full">
+                    Business
+                  </Label>
+                  <div className="w-full h-[2px] bg-[#e5e7eb]" />
+                  <Label className="text-lg font-normal text-neutral-700 py-3 px-0 text-center w-full">
+                    {flightData.BusinessClassPrice} pkr
+                  </Label>
+                </div>
+
+                <div className="items-center justify-center border-2 rounded-lg flex flex-col flex-wrap content-center min-w-32 text-center">
+                  <Label className="text-lg text-neutral-700 py-2 px-0 text-center w-full">
+                    First
+                  </Label>
+                  <div className="w-full h-[2px] bg-[#e5e7eb]" />
+                  <Label className="text-lg font-normal text-neutral-700 py-3 px-0 text-center w-full">
+                    {flightData.FirstClassPrice} pkr
+                  </Label>
+                </div>
+              </div>
+            </div>
+            <div className="inline-flex items-center justify-center self-start flex-1 flex-col">
+              <div className="inline-flex items-center justify-start self-center my-3">
+                <IconClick className="h-5 w-5 text-neutral-500" />
+                <Label className="text-lg text-neutral-700">
+                  Selected Seats:
+                </Label>
+              </div>
+              <div className="ml-4 text-sm">
+                {SelectedSeats.map((seat, index) => (
+                  <span key={index}>
+                    {`${seat.row}${seat.col}`} ({seat.group_name})
+                    {index !== SelectedSeats.length - 1 && ", "}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="inline-flex items-center justify-start self-center my-3">
+              <IconReceipt2 className="h-5 w-5 text-neutral-500" />
+              <Label className="text-lg text-neutral-700">
+                Booking Details:
+              </Label>
+            </div>
+
+            <div className=" min-h-8 mx-14 py-auto  border-2 border-neutral-400 rounded-md">
+              {SelectedSeats.map((seat, index) => (
+                <>
+                  <div key={index} className="text-base flex flex-row w-full">
+                    <div className="inline-flex items-center w-1/3 mx-2">
+                      {`${seat.row}${seat.col}`}
+                    </div>
+
+                    <div className="inline-flex items-center self-center w-1/3 mx-2">
+                      {seat.group_name}
+                    </div>
+
+                    <div className="inline-flex items-center self-center w-1/3 mx-2">
+                      {getPriceByGroupName(seat.group_name)} pkr
+                    </div>
+                  </div>
+                  <div className="w-full h-[2px] my-1 bg-neutral-400"></div>
+                </>
+              ))}
+              <div className="text-base flex flex-row w-full">
+                <div className="inline-flex items-center w-1/3 mx-2"/>           
+                <div className="inline-flex items-center self-center justify-end w-1/3 mx-2 font-medium">
+                  Total = 
+                </div>
+                <div className="inline-flex items-center self-center w-1/3 mx-2">
+                  {totalCost} pkr
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={SelectedSeats.length === 0 ? "hidden" : ""}>
+            <div className="h-12 items-center justify-center flex mt-5">
+              <Button
+                displayName="Book Now"
+                className="rounded-md w-fit px-6"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
 
 const LoadingModal = () => {
   return (
@@ -141,4 +348,13 @@ const LoadingModal = () => {
       </div>
     </div>
   );
+};
+
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return new Date(dateString).toLocaleDateString("en-US", options);
 };
