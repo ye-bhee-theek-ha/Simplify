@@ -27,6 +27,10 @@ const BookedSeatSchema = mongoose.Schema({
     group_name: {
         type: String,
         required: true
+    },
+    flight: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Flight'
     }
 });
 

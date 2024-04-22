@@ -7,7 +7,7 @@ import {
   IconBrandGithub,
   IconBrandGoogle,
 } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Loading } from "../Loading/Loading";
 import BottomGradient from "../ui/BottomGradient"
@@ -24,6 +24,7 @@ export function SignupForm() {
   const[error, SetError] = useState("");
   const[loading, SetLoading] = useState(false)
 
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
    
@@ -56,6 +57,9 @@ export function SignupForm() {
 
       console.log(data)
       localStorage.setItem("userInfo", JSON.stringify(data));
+
+      navigate('/');
+
       SetLoading(false);
       SetError("");
 

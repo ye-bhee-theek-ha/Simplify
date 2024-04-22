@@ -8,10 +8,11 @@ import {
   IconBrandGoogle,
 } from "@tabler/icons-react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Loading } from "../Loading/Loading";
 import BottomGradient from "../ui/BottomGradient";
+// @ts-ignore
 
 
 export function LoginForm() {
@@ -24,6 +25,7 @@ export function LoginForm() {
 
   const[loginAttempts, SetLoginAttempts] = useState(0)
 
+  const navigate = useNavigate();
 
   const checkEmail = (email: string) => {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -66,8 +68,10 @@ export function LoginForm() {
         config
       );
   
-      console.log(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
+
+      navigate('/');
+
       SetLoading(false);
       SetError("");
   

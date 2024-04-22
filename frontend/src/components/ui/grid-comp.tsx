@@ -1,6 +1,7 @@
 import { cn } from "../../utils/cn";
 import * as React from "react";
 import { useMotionTemplate, useMotionValue, motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export const BentoGrid = ({
   className,
@@ -28,7 +29,8 @@ export const BentoGridItem = ({
   header,
   icon,
   img,
-  type
+  type,
+  route = "/",
 }: {
   className?: string;
   title?: string | React.ReactNode;
@@ -37,6 +39,7 @@ export const BentoGridItem = ({
   icon?: React.ReactNode;
   img?: React.ReactNode;
   type?: string;
+  route?:string;
 }) => {
   const Content = () => {
     return (
@@ -61,12 +64,15 @@ export const BentoGridItem = ({
         className
       )}
     >
-      <div className=" flex-1 w-full justify-center overflow-hidden">
-        {img}
-        {header}
-      </div>
-      {type!="list" && <Content/>}
-
+      <Link
+        to={route}
+      >
+        <div className=" flex-1 w-full justify-center overflow-hidden">
+          {img}
+          {header}
+        </div>
+        {type!="list" && <Content/>}
+      </Link>
     </div>
   );
 };

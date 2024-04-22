@@ -177,6 +177,10 @@ const deleteFlight = asyncHandler(async (req, res) => {
 const bookSeats = async (req, res) => {
     const { FlightID, seats } = req.body;
 
+    console.log(req.body);
+    console.log(FlightID);
+    console.log(seats);
+
     try {
         const flight = await Flight.findOne({ FlightID });
 
@@ -185,19 +189,30 @@ const bookSeats = async (req, res) => {
             throw new Error("Flight not found");
         }
 
+        console.log(seats);
+
         // Iterate through each seat in the array
         for (const seat of seats) {
-            const { row, col, seat_group } = seat;
-
+            const { row, col, group_name } = seat;
+            
             // Check if the seat is already booked
-            const isBooked = flight.BookedSeats.some(bookedSeat => bookedSeat.row === row && bookedSeat.col === col && bookedSeat.seat_group === seat_group);
+            const isBooked = await BookedSeat.findOne({ row, col, group_name: group_name, flight: flight._id });
             if (isBooked) {
                 res.status(400);
-                throw new Error(`Seat (${row}, ${col}) in ${seat_group} is already booked`);
+                throw new Error(`Seat (${row}, ${col}) in ${group_name} is already booked`);
             }
 
-            // Add the seat to the booked seats array
-            flight.BookedSeats.push({ row, col, seat_group });
+            // Create a new BookedSeat document and save it
+            const newBookedSeat = new BookedSeat({
+                row,
+                col,
+                group_name: group_name,
+                flight: flight._id
+            });
+            await newBookedSeat.save();
+
+            // Add the created booked seat to the flight's booked seats array
+            flight.BookedSeats.push(newBookedSeat._id);
         }
 
         // Save the updated flight document

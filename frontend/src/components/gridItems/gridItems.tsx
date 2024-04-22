@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { cn } from "../../utils/cn";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BentoGridItem } from "../ui/grid-comp";
 import { motion } from "framer-motion";
 import { BrowseFlights, BrowseFlightsSm } from "../../screens/BrowseFlights/BrowseFlights";
@@ -15,6 +15,7 @@ import {
   IconMessage2,
   IconMapSearch,
 } from "@tabler/icons-react";
+import { Route } from "react-router-dom";
 
 export function GridItems() {
 
@@ -95,6 +96,10 @@ export function GridItems() {
     }
   };
 
+  useEffect(() => {
+    handleRefreshButtonClick()
+  }, [])
+
   const errMsg = ({error = "Something wrong on our End."}) => {
     return (
       <div className="bg-red-100 border text-sm border-red-400 text-red-700 mb-2 px-3 py-2 rounded relative flex" role="alert">
@@ -117,7 +122,7 @@ export function GridItems() {
       icon: <IconMapSearch className="icon h-4 w-4 text-neutral-500" />,
     },
     { 
-      Type : Type,
+      Type : "list",
       title: "Flights today",
       description: "Find flights leaving today.",
       header: <DisplayFlightsSm
@@ -126,7 +131,6 @@ export function GridItems() {
       />,
       className: "md:col-span-1",
       icon: <IconPlaneDeparture className="h-4 w-4 text-neutral-500" />,
-      changeable: true,
     },
     {
       title: "Contact us",
@@ -134,12 +138,15 @@ export function GridItems() {
       header: <Chatwithus />,
       className: "md:col-span-1",
       icon: <IconMessage2 className="h-4 w-4 text-neutral-500" />,
+      route: "/contactUs"
     },
     {
       title: "About us",
+      description: "One Stop for all your travelling needs",
       header: <Skeleton />,
-      className: "md:col-span-2",
+      className: "md:col-span-2 justify-end",
       icon: <IconUsersGroup className="h-4 w-4 text-neutral-500" />,
+      route: "/AboutUs"
     },
   ];
   
@@ -152,6 +159,8 @@ export function GridItems() {
           header={item.header}
           icon= {item.icon}
           className={item.className}
+          route={item.route}
+          
         />),
         className: item.className
         }))

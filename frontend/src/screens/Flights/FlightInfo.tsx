@@ -11,6 +11,8 @@ import { isErrored } from "stream";
 import { DisplayFlights } from "../../components/DisplayList/DisplayList";
 import { Seat_Picker } from "../../components/SeatPicker/SeatPicker";
 import { Button } from "../../components/button/button";
+import classnames from 'classnames';
+
 import {
   IconClock,
   IconTimeDuration0,
@@ -147,12 +149,32 @@ export function FlightInfo() {
 
   {console.log(SelectedSeats.length)}
 
+
+  const onsubmit = async () => {
+
+    const data = {
+      FlightID: FlightID,
+      seats: SelectedSeats
+    }
+
+    console.log(SelectedSeats)
+    console.log(FlightID);
+    try {
+      const response = await axios.post('http://localhost:5000/api/flights/book/', data);
+  
+      console.log(response.data);
+
+    } catch (error) {
+      console.error('Error booking seats:', error);
+    }
+  }
+
   return (
     <div className="">
       {loading && <LoadingModal />}
       <div className="flex">
         <div className="h-screen w-[380px] hover:w-[420px] overflow-hidden transform duration-700">
-          <Seat_Picker
+          <Seat_Picker  
             seatGroups={seatGroupsArray.map((seatGroup) => ({
               name: seatGroup.name,
               rows: seatGroup.rows || 0,
@@ -316,9 +338,9 @@ export function FlightInfo() {
                 </>
               ))}
               <div className="text-base flex flex-row w-full">
-                <div className="inline-flex items-center w-1/3 mx-2"/>           
+                <div className="inline-flex items-center w-1/3 mx-2" />
                 <div className="inline-flex items-center self-center justify-end w-1/3 mx-2 font-medium">
-                  Total = 
+                  Total =
                 </div>
                 <div className="inline-flex items-center self-center w-1/3 mx-2">
                   {totalCost} pkr
@@ -328,10 +350,13 @@ export function FlightInfo() {
           </div>
           <div className={SelectedSeats.length === 0 ? "hidden" : ""}>
             <div className="h-12 items-center justify-center flex mt-5">
-              <Button
-                displayName="Book Now"
-                className="rounded-md w-fit px-6"
-              />
+              <button onClick={onsubmit} type="button">
+                <div
+                  className="button flex items-center justify-center px-3 h-9 text-lg bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 dark:bg-zinc-800 w-full text-white rounded-full font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+                >
+                  <button onClick={onsubmit}>Book Now</button>
+                </div>
+              </button>
             </div>
           </div>
         </div>
