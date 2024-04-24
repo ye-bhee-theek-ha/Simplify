@@ -18,6 +18,13 @@ const UserSchema = mongoose.Schema(
             required: true,
             unique: true,
         },
+        Gender: {
+            type: String,
+            enum: ["Male", "Female"],
+        },
+        Age: {
+            type: Number,
+        },
         Password: {
             type: String,
             requied: true,
@@ -27,13 +34,13 @@ const UserSchema = mongoose.Schema(
             required: true,
             default: false,
         },
+        Img: {
+            type: String,
+            required: true,
+        },
         confirmationToken: {
             type: String,
-        },
-        isConfirmed: {
-            type: Boolean,
             required: true,
-            default: false,
         }
 
     },

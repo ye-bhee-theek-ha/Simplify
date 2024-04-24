@@ -80,6 +80,8 @@ export function FlightInfo() {
 
   const [loading, setLoading] = useState(false);
 
+  const [IsScheduled, SetIsScheduled] = useState(false);
+
   useEffect(() => {
     setLoading(true);
 
@@ -114,6 +116,12 @@ export function FlightInfo() {
   const seatGroupsArray = Object.values(flightData.SeatGroups);
   const BookedSeatsArray = Object.values(flightData.BookedSeats);
 
+
+  if (flightData.Status === "Scheduled") {
+    SetIsScheduled(true);
+  }
+
+
   const totalCost = SelectedSeats.reduce((total, seat) => {
     const seatGroup = seatGroupsArray.find((group) => group.name === seat.group_name);
     if (seatGroup) {
@@ -132,7 +140,7 @@ export function FlightInfo() {
       }
     }
     return total;
-  }, 0);
+    }, 0);
 
   const getPriceByGroupName = (groupName: string): number => {
     switch (groupName) {
@@ -174,21 +182,25 @@ export function FlightInfo() {
       {loading && <LoadingModal />}
       <div className="flex">
         <div className="h-screen w-[380px] hover:w-[420px] overflow-hidden transform duration-700">
-          <Seat_Picker  
-            seatGroups={seatGroupsArray.map((seatGroup) => ({
-              name: seatGroup.name,
-              rows: seatGroup.rows || 0,
-              cols: seatGroup.cols || 0,
-            }))}
-            BookedSeats={BookedSeatsArray.map((BookedSeat) => ({
-              seat_group: BookedSeat.group_name,
-              row: BookedSeat.row,
-              col: BookedSeat.col,
-            }))}
-            SelectedSeats={SelectedSeats}
-            SetSelectedSeats={SetSelectedSeats}
-            className="mx-6 pt-10 hover:pt-0 transform duration-700 hover:-translate-y-7"
-          />
+          { IsScheduled &&
+            <Seat_Picker  
+              seatGroups={seatGroupsArray.map((seatGroup) => ({
+                name: seatGroup.name,
+                rows: seatGroup.rows || 0,
+                cols: seatGroup.cols || 0,
+              }))}
+              BookedSeats={BookedSeatsArray.map((BookedSeat) => ({
+                seat_group: BookedSeat.group_name,
+                row: BookedSeat.row,
+                col: BookedSeat.col,
+              }))}
+              SelectedSeats={SelectedSeats}
+              SetSelectedSeats={SetSelectedSeats}
+              className="mx-6 pt-10 hover:pt-0 transform duration-700 hover:-translate-y-7"
+          />}
+          {
+            !IsScheduled && <></>
+          }
         </div>
 
         <div className="flex flex-col flex-1 mt-12 mx-8 p-8 rounded-lg border-2 overflow-y-auto h-[31rem]">

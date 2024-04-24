@@ -11,7 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Loading } from "../Loading/Loading";
 import BottomGradient from "../ui/BottomGradient"
-
+import { useAuth } from "../../auth/auth"
 
 export function SignupForm() {
   
@@ -20,11 +20,23 @@ export function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("Male");
+
+  const handleGenderChange = () => {
+    if (gender === "Male") {
+      setGender("Female");
+    } else if (gender === "Female") {
+      setGender("Male");
+    } 
+  };
 
   const[error, SetError] = useState("");
   const[loading, SetLoading] = useState(false)
 
   const navigate = useNavigate();
+
+  const {storeTokenInLS, SetImg} = useAuth()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
    
@@ -44,21 +56,32 @@ export function SignupForm() {
       }
       SetLoading(true);
 
-      const { data } = await axios.post(
+      const data = await axios.post(
         "http://127.0.0.1:5000/api/users/register", 
         {
           FirstName: firstName,
           LastName: lastName,
           Email: email,
-          Password: password
+          Password: password,
+          Age: age,
+          Gender: gender
         },
         config
       )
 
       console.log(data)
-      localStorage.setItem("userInfo", JSON.stringify(data));
+
+      if (data.data) {
+        const res = data.data;
+        storeTokenInLS(res.token);
+        SetImg(res.Img);
+
+        } else {
+            console.log("Response data is empty.");
+        }
 
       navigate('/');
+      
 
       SetLoading(false);
       SetError("");
@@ -114,6 +137,26 @@ export function SignupForm() {
             />
           </LabelInputContainer>
         </div>
+
+        <div className="flex flex-row space-y-0 space-x-2 mb-4">
+          <LabelInputContainer>
+            <Label htmlFor="gender">Gender</Label>
+            <Btn text={gender} onClick={handleGenderChange} />
+          </LabelInputContainer>
+
+          <LabelInputContainer>
+            <Label htmlFor="age">Age</Label>
+            <Input
+             id="Age"
+             placeholder="19"
+             type="number"
+             value={age}
+             onChange={(e) => setAge(e.target.value)}
+             required= {true}
+            />
+          </LabelInputContainer>
+        </div>
+
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
           <Input 
@@ -221,5 +264,18 @@ const LoadingModal = () => {
         <Loading />
       </div>
     </div>
+  );
+};
+
+const Btn = ({ text, onClick, className, id = "FlightType" , name = "FlightType", value}: { text: string; onClick?: () => void; className?:string; id?:string; name?:string; value?:string }) => {
+  return (
+    <span
+      className={cn("flex h-10 w-full border-none bg-gray-50 dark:bg-zinc-800 dark:text-white shadow-input rounded-md px-3 py-2 placeholder:text-neutral-400 dark:placeholder-text-neutral-600 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600 disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-[0px_0px_1px_1px_var(--neutral-700)] group-hover/input:shadow-none transition duration-400 items-center text-lg font-medium text-gray-600 hover:ring-2 cursor-pointer self-end mt-1 justify-center", className)}
+      onClick={onClick}
+      style={{ transition: "all 0.3s" }}
+      id = {id}
+    >
+      {text}
+    </span>
   );
 };

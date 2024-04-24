@@ -1,29 +1,25 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Menu, MenuItem } from "../ui/navbar-menu";
-
+import axios from "axios";
 import { cn } from "../../utils/cn";
 import { Title } from "../ui/title";
 import { Button } from "../button/button";
 import { BackgroundGradient } from "../ui/background-gradient";
 import { userInfo } from "os";
+import { useAuth } from "../../auth/auth"
+import { Link, useNavigate } from "react-router-dom";
+
 
 export function Navbar({ className }: { className?: string }) {
+  
   const [active, setActive] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const userInfoString = localStorage.getItem("userInfo");
+  const { isloggedin, getToken, GetImg } = useAuth();
 
-  useEffect(() => {
-    const userInfoString = localStorage.getItem('userInfo');
-    if (userInfoString) {
-      setIsLoggedIn(true);
-      const userInfo = JSON.parse(userInfoString);
-      console.log(userInfo);
-    } else {
-      console.log('user not logged in');
-    }
-  }, []);
+  const Img = isloggedin ? GetImg() : null;
+
+  const token = isloggedin ? getToken() : null;
 
   return (
     <div
@@ -58,11 +54,25 @@ export function Navbar({ className }: { className?: string }) {
         </div>
         <div className="self-center">
           <BackgroundGradient className="" animate={true}>
-            {!isLoggedIn && <Button displayName="Signup" route="/signup" />}
-            {isLoggedIn && <Button displayName="username" route="/dashboard"/>}
+            {!isloggedin && <Button displayName="Signup" route="/signup" />}
+            {isloggedin && <ProfileImg imageData={Img}/>}
           </BackgroundGradient>
         </div>
       </Menu>
     </div>
   );
 }
+
+
+const ProfileImg = ({ imageData }: {imageData: String}) => {
+  const navigate = useNavigate();
+  return (
+    <div className="profile-img">
+      <button
+        onClick = {() => navigate("/")}
+      >
+        <img src={`data:image/png;base64,${imageData}`} alt="Profile" className="h-9 w-9 rounded-full" />
+      </button>
+    </div>
+  );
+};

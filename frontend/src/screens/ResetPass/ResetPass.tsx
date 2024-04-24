@@ -6,6 +6,7 @@ import { cn } from "../../utils/cn";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Loading } from "../../components/Loading/Loading";
+import { useParams } from "react-router-dom";
 
 export function ResetPasswordForm() {
   const [password, setPassword] = useState("");
@@ -13,6 +14,8 @@ export function ResetPasswordForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordChanged, setpasswordChanged] = useState(false);
+
+  const params = useParams()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,9 +31,7 @@ export function ResetPasswordForm() {
       return false;
     }
 
-    //extract confirmationToken from the url
-    const urlParts = window.location.pathname.split('/');
-    const confirmationToken = urlParts[urlParts.length - 1];
+    const confirmationToken = params.token;
 
     try {
       const config = {

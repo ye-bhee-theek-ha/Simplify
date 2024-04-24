@@ -350,8 +350,9 @@ export function BrowseFlights() {
       </form>
     </div> 
     <div className="flex flex-row">
-      <div className="min-w-56 w-56 my-14 px-5 mx-5 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-start hidden xl:flex">
-            my-14 px-5 mx-10 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center
+      <div className=" flex-col min-w-56 w-56 my-14 px-5 mx-5 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-start hidden xl:flex">
+          <h3 className="text-lg font-semibold mb-3 ">Discounts</h3>
+          <p>20% off on master cards</p>
       </div>
       <div className="flex flex-1 my-14 px-5 mx-5 mr-10 rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center">
         {error && <DisplayError error = {error} />}

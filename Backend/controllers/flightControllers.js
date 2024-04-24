@@ -113,6 +113,20 @@ const getFlightById = asyncHandler(async (req, res) => {
     res.json(flight);
 });
 
+const Flightexists = asyncHandler(async (req, res) => {
+    const { FlightID } = req.params;
+
+    const flight = await Flight.findOne({ FlightID });
+
+    if (!flight) {
+        res.json("")
+    }
+    else 
+    {
+        res.json(flight);
+    }
+});
+
 
 const updateFlight = asyncHandler(async (req, res) => {
     const { FlightID } = req.params;
@@ -227,4 +241,4 @@ const bookSeats = async (req, res) => {
 
 
 
-module.exports = { createFlight, getFlights, getFlightById, getFilteredFlights, updateFlight, deleteFlight, bookSeats };
+module.exports = { createFlight, getFlights, getFlightById, getFilteredFlights, updateFlight, deleteFlight, bookSeats,Flightexists };

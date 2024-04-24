@@ -268,7 +268,7 @@ const Nodata = () => {
 
 const LoadingModal = () => {
     return (
-      <div className="absolute inset-0 z-50 flex m-2 rounded-xl justify-center items-center backdrop-filter backdrop-blur-lg bg-opacity-50">
+      <div className="absolute inset-0 z-5 flex m-2 rounded-xl justify-center items-center backdrop-filter backdrop-blur-lg bg-opacity-50">
         <div className="dark:bg-black p-8 rounded-lg shadow-lg">
           <Loading />
         </div>

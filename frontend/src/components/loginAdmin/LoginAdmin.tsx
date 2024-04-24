@@ -12,13 +12,10 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Loading } from "../Loading/Loading";
 import BottomGradient from "../ui/BottomGradient";
-import { useAuth } from "../../auth/auth"
-import { response } from "express";
-
 // @ts-ignore
 
 
-export function LoginForm() {
+export function LoginAdmin() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,8 +26,6 @@ export function LoginForm() {
   const[loginAttempts, SetLoginAttempts] = useState(0)
 
   const navigate = useNavigate();
-
-  const {storeTokenInLS, SetImg} = useAuth()
 
   const checkEmail = (email: string) => {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -64,28 +59,18 @@ export function LoginForm() {
       }
       SetLoading(true);
   
-      const data  = await axios.post(
-        "http://127.0.0.1:5000/api/users/login", 
+      const { data } = await axios.post(
+        "http://127.0.0.1:5000/api/admin/login", 
         {
           "Email" : email,
           "Password": password
         },
         config
       );
+  
+      localStorage.setItem("userInfo", JSON.stringify(data));
 
-      console.log(data.data.token)
-      
-      if (data.data) {
-        const res = data.data;
-        console.log(res.token);
-        storeTokenInLS(res.token);
-        SetImg(res.Img);
-        } else {
-            console.log("Response data is empty.");
-        }
       navigate('/');
-      
-
 
       SetLoading(false);
       SetError("");
@@ -122,7 +107,10 @@ export function LoginForm() {
 
 
   return (
-    <div className="max-w-sm w-full mx-auto rounded-2xl p-3 md:p-5 shadow-input bg-white dark:bg-black self-center">
+    <div className="max-w-sm w-full mx-auto rounded-2xl p-3 md:p-5 pt-0 md:pt-0 shadow-input bg-white dark:bg-black self-center">
+      <div className="text-sm underline text-slate-800 mb-3 md:mb-5 self-start flex pt-1">
+        seller account
+      </div>
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Login to Simplifly
       </h2>
@@ -165,10 +153,9 @@ export function LoginForm() {
 
         <p className="mt-2 flex text-xs font-normal justify-self-start mx-2">
             Don't have an account?
-            <Link to="/signup"
-                    className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1">
+            <button className="text-indigo-500 hover:text-blue-600 hover:underline  font-semibold transition duration-150 ease-in-out hover:text-danger-600 focus:text-danger-600 active:text-danger-700 mx-1">
                 Register
-            </Link>
+            </button>
         </p>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-6 h-[1px] w-full" />
