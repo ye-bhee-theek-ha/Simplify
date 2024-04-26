@@ -14,18 +14,48 @@ import { cn } from "../../utils/cn"
 import UploadProfileImage from "../imgupload";
 import {
     IconX
-  } from "@tabler/icons-react";
+} from "@tabler/icons-react";
 import { set } from "mongoose";
-  
+import { DisplayFlights } from "../../components/DisplayList/DisplayList";
+import { Loading } from "../../components/Loading/Loading";
 
+interface Booking {
+    _id: string;
+    UserToken: string;
+    FlightID: string;
+    row: string;
+    col: number;
+    group_name: string;
+    createdAt: string;
+    updatedAt: string;
+    flightData: {
+        FlightID: string;
+        Date: Date;
+        DepartureCity: string;
+        DestinationCity: string;
+        DepartureTime: string;
+        FlightDuration: number;
+        AirplaneModel: string;
+        FlightType: string;
+        FirstClassPrice: number;
+        BusinessClassPrice: number;
+        EconomyClassPrice: number;
+        Status: string;
+        createdAt: string;
+        updatedAt: string;
+    };
+}
 
 export function Dashboard() {
-    const { isloggedin, getToken, GetImg } = useAuth();
+    const { isloggedin, getToken, GetImg, logout } = useAuth();
     const [message, setMessage] = useState("");
     const [IsMessage, setIsMessage] = useState(0);
     const Img = isloggedin ? GetImg() : null;
 
     const token = isloggedin ? getToken() : null;
+
+    const [TabclassName, SetTabclassName] = useState("");
+    const navigate = useNavigate()
 
     const tabs = [
         {
@@ -34,7 +64,7 @@ export function Dashboard() {
             content: (
                 <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-SoftGreen to-PaleBlue">
                     <p className="text-green-950">Profile</p>
-                    <Profile imageData={Img} token={token} msg={setMessage} Ismsg={setIsMessage} />
+                    <Profile imageData={Img} token={token} msg={setMessage} Ismsg={setIsMessage} logout={logout} navigate={navigate}/>
                 </div>
             ),
         },
@@ -42,9 +72,9 @@ export function Dashboard() {
             title: "Bookings",
             value: "Bookings",
             content: (
-                <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-SoftGreen to-PaleBlue">
-                    <p className="text-green-950">Your Bookings</p>
-                    <DummyContent />
+                <div className="w-full overflow-hidden relative h-full rounded-2xl font-bold text-white bg-gradient-to-br from-SoftGreen to-PaleBlue">
+                    <p className="text-xl md:text-4xl text-green-950 z-30 mt-8">Your Bookings</p>
+                    <Bookings token={token}/>
                 </div>
             ),
         },
@@ -71,13 +101,15 @@ export function Dashboard() {
     ];
 
     return (
-        <div className="h-[30rem] md:h-[30rem] [perspective:1000px] relative flex flex-col max-w-5xl mx-auto w-full  items-start justify-start px-10">
+        <div className={cn("h-[33.5rem] [perspective:1000px] relative flex flex-col max-w-5xl mx-auto w-full  items-start justify-start px-10", TabclassName)}>
             {isloggedin && <Tabs tabs={tabs} />}
 
             {!isloggedin && (
-                <div className="h-screen w-screen flex flex-col content-center justify-center">
-                    You are not logged In.
-                    <Button displayName="Login" route="/login" />
+                <div className="h-full w-full flex flex-col content-center justify-center">
+                    <p className="text-lg text-slate-900"> You are not logged In. </p>
+                    <div className="w-1/3 flex justify-center mt-6 self-center">
+                        <Button displayName="Login" route="/login" />
+                    </div>
                 </div>
             )}
 
@@ -96,12 +128,16 @@ const Profile = ({
     imageData,
     token,
     msg,
-    Ismsg
+    Ismsg,
+    logout,
+    navigate
 }: {
     imageData: String;
     token: string;
     msg: Function;
     Ismsg: Function;
+    logout: Function;
+    navigate: Function;
 }) => {
     const [FirstName, SetFirstName] = useState("");
     const [LastName, SetLastName] = useState("");
@@ -193,7 +229,7 @@ const Profile = ({
     return (
         <div className="mt-10">
             <div className="flex flex-row">
-                <div className="h-56 w-56">
+                <div className="h-48 w-56">
                     <img
                         src={`data:image/png;base64,${imageData}`}
                         alt="Profile"
@@ -217,7 +253,7 @@ const Profile = ({
                                 id="firstname"
                                 placeholder="Ali"
                                 type="text"
-                                value={FirstName}
+                                value={FirstName || ""}
                                 onChange={(e) => ChangeInfo && SetFirstName(e.target.value)}
                                 required={true}
                             />
@@ -228,7 +264,7 @@ const Profile = ({
                                 id="lastname"
                                 placeholder="Abdullah"
                                 type="text"
-                                value={LastName}
+                                value={LastName || ""}
                                 onChange={(e) => ChangeInfo && SetLastName(e.target.value)}
                                 required={true}
                             />
@@ -247,7 +283,7 @@ const Profile = ({
                                     id="Age"
                                     placeholder="19"
                                     type="number"
-                                    value={Age}
+                                    value={Age || 0}
                                     onChange={(e) => ChangeInfo && SetAge(parseInt(e.target.value))}
                                     required={true}
                                 />
@@ -260,13 +296,19 @@ const Profile = ({
                                 id="email"
                                 placeholder="myemail@gmail.com"
                                 type="email"
-                                value={Email}
+                                value={Email || ""}
                                 onChange={(e) => ChangeInfo && SetEmail(e.target.value)}
                                 required={true}
                             />
                         </LabelInputContainer>
                     </div>
-                    <div className="flex justify-end mr-7">
+                    <div className="flex justify-end mr-7 space-x-7">
+                        <Btn
+                            text="Logout"
+                            onClick={ () => {logout() && navigate("/")} }
+                            className="w-fit px-7 rounded-lg self-end flex"
+                        />
+
                         {
                             !ChangeInfo &&
                             <Btn
@@ -283,7 +325,6 @@ const Profile = ({
                                 className="w-fit px-7 rounded-lg self-end flex"
                             />
                         }
-
                     </div>
                 </div>
             </div>
@@ -299,12 +340,11 @@ const Security = ({ token, msg, Ismsg }: { token: string, msg: Function, Ismsg: 
 
     const handleChangePassword = async () => {
         try {
-            if (currentPassword != confirmPassword)
-            {
+            if (currentPassword != confirmPassword) {
                 msg("Passwords do not Match.");
                 Ismsg(2);
                 return;
-            }    
+            }
             const response = await axios.post("http://localhost:5000/api/users/ChangePassword", {
                 newPassword,
                 token,
@@ -327,7 +367,7 @@ const Security = ({ token, msg, Ismsg }: { token: string, msg: Function, Ismsg: 
                         <Input
                             type="password"
                             id="currentPassword"
-                            value={currentPassword}
+                            value={currentPassword || ""}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                         />
                     </LabelInputContainer>
@@ -338,7 +378,7 @@ const Security = ({ token, msg, Ismsg }: { token: string, msg: Function, Ismsg: 
                         <Input
                             type="password"
                             id="newPassword"
-                            value={newPassword}
+                            value={newPassword || ""}
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </LabelInputContainer>
@@ -349,7 +389,7 @@ const Security = ({ token, msg, Ismsg }: { token: string, msg: Function, Ismsg: 
                         <Input
                             type="password"
                             id="confirmPassword"
-                            value={confirmPassword}
+                            value={confirmPassword || ""}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                     </LabelInputContainer>
@@ -366,9 +406,85 @@ const Security = ({ token, msg, Ismsg }: { token: string, msg: Function, Ismsg: 
 };
 
 const Bookings = ({ token }: { token: string }) => {
-    return (
-        <div>
 
+    const [bookings, setBookings] = useState<Booking[] | null>(null);
+    const [Isloading, SetIsloading] = useState(true);
+    const [notFound, SetnotFound] = useState(false);
+    const [notFoundMsg, SetnotFoundMsg] = useState("");
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                SetIsloading(true);
+
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                };
+
+                const response = await axios.post(
+                    'http://localhost:5000/api/bookedFlights/getallbyuser',
+                    {
+                        "token": token,
+                    },
+                    config
+                );
+
+                const bookingData: Booking[] = response.data.data;
+
+                // Fetch flight details for each booking
+                const bookingsWithFlightData: Booking[] = [];
+                for (const booking of bookingData) {
+                    const flightResponse = await axios.post(
+                        `http://localhost:5000/api/flights/getFlightById/${booking.FlightID}`
+                    );
+                    const flightData = flightResponse.data;
+                    const bookingWithFlightData: Booking = { ...booking, flightData };
+                    bookingsWithFlightData.push(bookingWithFlightData);
+                }
+
+                setBookings(bookingsWithFlightData);
+                SetIsloading(false);
+
+            } catch (error: any) {
+                console.error('Error fetching data:', error.response.data.message);
+                SetnotFoundMsg(error.response.data.message);
+                SetnotFound(true);
+                setBookings(null);
+                SetIsloading(false);
+            }
+        };
+
+        fetchData();
+    }, [token]);
+
+    console.log(bookings)
+
+    
+
+    return (
+        <div className="m-4 mt-12 pb-28 h-full overflow-auto scrollbar-hide">
+            {Isloading && <LoadingModal />}
+            {notFound && <div className="h-full w-full items-center justify-center text-2xl font-bold text-teal-950"> {notFoundMsg} </div>}
+            {
+                bookings?.map((booking) => (
+                    <div className="flex flex-col">
+                        <div className="px-4 rounded-lg shadow-md font-medium text-neutral-700 bg-white border border-gray-100 py-2 flex h-12 space-x-4 items-center">
+                            <div className="flex flex-row">
+                                Seat Type: <p className="font-normal pl-2">{booking.group_name}</p>
+                            </div>
+                            <div className="flex flex-row">
+                                Seat ID: <p className="font-normal pl-2">{booking.row + booking.col}</p>
+                            </div>
+                        </div>
+                        <DisplayFlights
+                            data= {[booking.flightData]}
+                            Isloading={false}
+                        />
+                    </div>
+                ))
+            }
         </div>
     )
 };
@@ -408,8 +524,8 @@ const ErrMsg = ({ msg = " Wrong Email or Password.", Ismsg }: { msg: String, Ism
                 role="alert"
             >
                 <strong className="font-semibold">{msg}</strong>
-                <button className="pl-6" onClick={() => {Ismsg(0)}}>
-                    <IconX className="h-4 w-4"/>
+                <button className="pl-6" onClick={() => { Ismsg(0) }}>
+                    <IconX className="h-4 w-4" />
                 </button>
             </div>
         </div>
@@ -417,15 +533,25 @@ const ErrMsg = ({ msg = " Wrong Email or Password.", Ismsg }: { msg: String, Ism
 };
 
 
-const SuccessMsg = ({ msg = "Success!!", Ismsg}: { msg: String, Ismsg: Function}) => {
+const SuccessMsg = ({ msg = "Success!!", Ismsg }: { msg: String, Ismsg: Function }) => {
     return (
         <div className="absolute top-0 right-0 mt-4 mr-4">
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex min-w-52" role="alert">
                 <strong className="font-semibold">{msg}</strong>
-                <button className="pl-6" onClick={() => {Ismsg(0)}}>
-                    <IconX className="h-4 w-4"/>
+                <button className="pl-6" onClick={() => { Ismsg(0) }}>
+                    <IconX className="h-4 w-4" />
                 </button>
             </div>
         </div>
     );
 };
+
+const LoadingModal = () => {
+    return (
+        <div className="absolute w-full h-full inset-0 z-20 flex m-2 rounded-xl justify-center items-center backdrop-filter bg-opacity-50">
+            <div className="dark:bg-black p-8 rounded-lg shadow-lg">
+                <Loading />
+            </div>
+        </div>
+    );
+  };

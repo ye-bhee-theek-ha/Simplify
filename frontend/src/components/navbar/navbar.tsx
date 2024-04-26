@@ -17,9 +17,18 @@ export function Navbar({ className }: { className?: string }) {
 
   const { isloggedin, getToken, GetImg } = useAuth();
 
-  const Img = isloggedin ? GetImg() : null;
+  let Img = isloggedin ? GetImg() : null;
 
-  const token = isloggedin ? getToken() : null;
+  let token = isloggedin ? getToken() : null;
+
+  useEffect(() => {
+
+    Img = isloggedin ? GetImg() : null;
+
+    token = isloggedin ? getToken() : null;
+
+  },[isloggedin])
+
 
   return (
     <div
@@ -69,7 +78,7 @@ const ProfileImg = ({ imageData }: {imageData: String}) => {
   return (
     <div className="profile-img">
       <button
-        onClick = {() => navigate("/")}
+        onClick = {() => navigate("/dashboard")}
       >
         <img src={`data:image/png;base64,${imageData}`} alt="Profile" className="h-9 w-9 rounded-full" />
       </button>

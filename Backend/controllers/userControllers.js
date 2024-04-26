@@ -188,7 +188,8 @@ const getDetails = asyncHandler ( async (req, res) => {
                 LastName : user.LastName,
                 Email : user.Email,
                 Img : user.Img,
-                Gender : user.Gender
+                Gender : user.Gender,
+                Age: user.Age
             })
         }
     }

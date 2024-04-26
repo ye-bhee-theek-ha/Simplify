@@ -76,16 +76,16 @@ const cancelBookedFlight = asyncHandler(async (req, res) => {
 
 // Controller to get all booked flights by user token
 const getAllBookedFlightsByUserToken = asyncHandler(async (req, res) => {
-    const { UserToken } = req.body;
+    const { token } = req.body;
 
     // Find all booked flights with the specified user token
-    const bookedFlights = await BookedFlights.find({ UserToken });
+    const bookedFlights = await BookedFlights.find({ "UserToken":token });
 
     // Check if there are any booked flights found
     if (bookedFlights.length === 0) {
         return res.status(404).json({
             success: false,
-            message: "No booked flights found for the user token provided"
+            message: "No booked flights found"
         });
     }
 

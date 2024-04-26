@@ -30,7 +30,6 @@ interface Flight {
   DepartureCity: string;
   DestinationCity: string;
   DepartureTime: string;
-  ArrivalTime: string;
   AirplaneModel: string;
   FlightType: string;
   Status: string;
@@ -103,7 +102,6 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
   Isloading,
   data,
 }) => {
-
     console.log("display list")
     console.log(data)
 
@@ -196,7 +194,8 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
           <div className="flex items-center">
             <Button
               className="h-12 rounded-xl text-center flex"
-              displayName="Book Now"
+              displayName="More Info"
+              route={"/Flights/"+FlightId}
             />
           </div>
         </div>
@@ -204,7 +203,7 @@ export const DisplayFlights: React.FC<DisplayFlightsProps> = ({
     };
 
   return (
-    <div className="h-full w-full">
+    <div className="h-fit w-full">
         <div>
             {Isloading && <LoadingModal />}
             {data?.length == 0 ?
