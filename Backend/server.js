@@ -6,6 +6,7 @@ const userRoutes = require("./routes/userRoutes");
 const flightRoutes = require("./routes/flightRoutes")
 const airportRouts = require("./routes/airportRoutes")
 const UserReviewsRoutes = require("./routes/UserReviewsRoutes")
+const bookedFlightsRoutes = require("./routes/bookedFlightsRoutes")
 const { NotFound, errHandler } = require("./middlewares/errorMiddleware");
 
 //const uploadToMongo = require('./utils/upload_to_mongo');
@@ -31,6 +32,7 @@ app.use("/api/users", userRoutes)
 app.use("/api/flights", flightRoutes)
 app.use("/api/airports", airportRouts)
 app.use("/api/reviews", UserReviewsRoutes)
+app.use("/api/bookedFlights", bookedFlightsRoutes)
 
 app.use(NotFound);
 app.use(errHandler);

@@ -120,33 +120,54 @@ const forgotPassword = asyncHandler (async (req, res) => {
 })
 
 const resetPassword = asyncHandler ( async (req, res) => {
-    //add server side password checker
-    const { newPassword, confirmationToken } = req.body;
+
+    const { newPassword, token } = req.body;
 
     console.log(req.body);
 
-    const newconfirmationToken = generateToken();
-
     try {
-        const user = await User.findOne({ confirmationToken });
+        const user = await User.findOne({ "confirmationToken":token });
 
         if (!user) {
             return res.status(400).json({ message: 'Invalid or expired token' });
         }
 
-        // Update user's password
-        // ////fix error Hashing twice
-        // const salt = await bcrypt.genSalt(10);
-        // user.Password = await bcrypt.hash(newPassword, salt);
-        
-        user.Password = newPassword;
-        user.confirmationToken = newconfirmationToken; // Reset confirmation token
-        await user.save();
-
         res.status(200).json({ message: 'Password reset successfully' });
     } catch (error) {
         console.error('Error resetting password:', error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+const ChangePassword = asyncHandler(async (req, res) => {
+    const { newPassword, token, currentPassword } = req.body;
+    
+    console.log(newPassword);
+    console.log(token);
+    console.log(currentPassword);
+
+
+    try {
+      const user = await User.findOne({ "confirmationToken": token });
+  
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid or expired token' });
+      }
+  
+      const isPasswordMatch = await bcrypt.compare(currentPassword, user.Password);
+  
+      if (!isPasswordMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+  
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.Password = hashedPassword;
+      await user.save();
+  
+      res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -205,5 +226,39 @@ const uploadImg = asyncHandler ( async (req, res) => {
     }
 });
 
+const updateDetails = asyncHandler(async (req, res) => {
+    const { token, FirstName, LastName, Email, Gender, Age } = req.body;
+  
+    try {
+      const user = await User.findOne({ "confirmationToken": token });
+  
+      if (!user) {
+        throw new Error("User not found or invalid token");
+      }
+  
+      if (FirstName) {
+        user.FirstName = FirstName;
+      }
+      if (LastName) {
+        user.LastName = LastName;
+      }
+      if (Email) {
+        user.Email = Email;
+      }
+      if (Gender) {
+        user.Gender = Gender;
+      }
+      if (Age) {
+        user.Age = Age;
+      }
+     
+      await user.save();
+  
+      res.status(200).json({ message: "User details updated successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Error updating user details", error: error.message });
+    }
+  });
 
-module.exports = { registerUser, loginUser , forgotPassword, resetPassword, confirm, getDetails, uploadImg };
+
+module.exports = { registerUser, loginUser , forgotPassword, resetPassword, ChangePassword, confirm, getDetails, uploadImg, updateDetails };

@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Label } from "../../components/ui/label";
-import { Input } from "../../components/ui/input";
-import { cn } from "../../utils/cn";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { Loading } from "../../components/Loading/Loading";
-import BottomGradient from "../../components/ui/BottomGradient";
-import { isErrored } from "stream";
-import { DisplayFlights } from "../../components/DisplayList/DisplayList";
 import { Seat_Picker } from "../../components/SeatPicker/SeatPicker";
-import { Button } from "../../components/button/button";
-import classnames from 'classnames';
+import { useAuth } from "../../auth/auth";
+
 
 import {
   IconClock,
@@ -34,6 +28,7 @@ import {
   IconPlaneTilt,
   IconMapPins,
   IconWorld,
+  IconX
 } from "@tabler/icons-react";
 
 interface SeatGroup {
@@ -72,15 +67,46 @@ interface FlightData {
 export function FlightInfo() {
   const { FlightID } = useParams();
 
+  const { getToken, isloggedin } = useAuth();
+
   const [SelectedSeats, SetSelectedSeats] = useState<
     { row: string; col: number; group_name: string }[]
   >([]);
 
   const [flightData, setFlightData] = useState<FlightData>();
-
   const [loading, setLoading] = useState(false);
-
   const [IsScheduled, SetIsScheduled] = useState(false);
+
+  const [message, setMessage] = useState("");
+  const [IsMessage, setIsMessage] = useState(0);
+
+  const config = {
+    headers: {
+        "Content-type": "application/json",
+    },
+};
+
+  const totalCost = useMemo(() => {
+    return SelectedSeats.reduce((total, seat) => {
+      const seatGroup = seatGroupsArray.find((group) => group.name === seat.group_name);
+      if (seatGroup) {
+        switch (seat.group_name) {
+          case "Economy Class":
+            total += flightData?.EconomyClassPrice || 0;
+            break;
+          case "Business Class":
+            total += flightData?.BusinessClassPrice || 0;
+            break;
+          case "First Class":
+            total += flightData?.FirstClassPrice || 0;
+            break;
+          default:
+            break;
+        }
+      }
+      return total;
+    }, 0);
+  }, [SelectedSeats, flightData]);
 
   useEffect(() => {
     setLoading(true);
@@ -89,7 +115,7 @@ export function FlightInfo() {
       try {
         const response = await axios.post(
           `http://127.0.0.1:5000/api/flights/getFlightById/${FlightID}`
-        );
+          , config);
         setFlightData(response.data);
         setLoading(false);
       } catch (error) {
@@ -121,27 +147,6 @@ export function FlightInfo() {
     SetIsScheduled(true);
   }
 
-
-  const totalCost = SelectedSeats.reduce((total, seat) => {
-    const seatGroup = seatGroupsArray.find((group) => group.name === seat.group_name);
-    if (seatGroup) {
-      switch (seat.group_name) {
-        case "Economy Class":
-          total += flightData.EconomyClassPrice;
-          break;
-        case "Business Class":
-          total += flightData.BusinessClassPrice;
-          break;
-        case "First Class":
-          total += flightData.FirstClassPrice;
-          break;
-        default:
-          break;
-      }
-    }
-    return total;
-    }, 0);
-
   const getPriceByGroupName = (groupName: string): number => {
     switch (groupName) {
       case "Economy Class":
@@ -167,6 +172,7 @@ export function FlightInfo() {
 
     console.log(SelectedSeats)
     console.log(FlightID);
+
     try {
       const response = await axios.post('http://localhost:5000/api/flights/book/', data);
   
@@ -175,15 +181,36 @@ export function FlightInfo() {
     } catch (error) {
       console.error('Error booking seats:', error);
     }
-  }
+
+    try {
+      for (const seat of SelectedSeats) {
+          const response = await axios.post('http://localhost:5000/api/bookedFlights/book', {
+              "UserToken": getToken(),
+              "FlightID": FlightID,
+              "row": seat.row,
+              "col": seat.col,
+              "group_name": seat.group_name,
+          });
+      }
+      setMessage("Seats Successfully Booked");
+      setIsMessage(1)
+  } catch (error: any) {
+
+    setMessage(error.response.data.message);
+    setIsMessage(1)
+
+  }}
 
   return (
     <div className="">
       {loading && <LoadingModal />}
+      {IsMessage == 2 && <ErrMsg msg={message} Ismsg={setIsMessage} />}
+      {IsMessage == 1 && <SuccessMsg msg={message} Ismsg={setIsMessage} />}
+
       <div className="flex">
         <div className="h-screen w-[380px] hover:w-[420px] overflow-hidden transform duration-700">
-          { IsScheduled &&
-            <Seat_Picker  
+          {IsScheduled && (
+            <Seat_Picker
               seatGroups={seatGroupsArray.map((seatGroup) => ({
                 name: seatGroup.name,
                 rows: seatGroup.rows || 0,
@@ -197,10 +224,9 @@ export function FlightInfo() {
               SelectedSeats={SelectedSeats}
               SetSelectedSeats={SetSelectedSeats}
               className="mx-6 pt-10 hover:pt-0 transform duration-700 hover:-translate-y-7"
-          />}
-          {
-            !IsScheduled && <></>
-          }
+            />
+          )}
+          {!IsScheduled && <></>}
         </div>
 
         <div className="flex flex-col flex-1 mt-12 mx-8 p-8 rounded-lg border-2 overflow-y-auto h-[31rem]">
@@ -362,13 +388,12 @@ export function FlightInfo() {
           </div>
           <div className={SelectedSeats.length === 0 ? "hidden" : ""}>
             <div className="h-12 items-center justify-center flex mt-5">
-              <button onClick={onsubmit} type="button">
-                <div
-                  className="button flex items-center justify-center px-3 h-9 text-lg bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 dark:bg-zinc-800 w-full text-white rounded-full font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-                >
-                  <button onClick={onsubmit}>Book Now</button>
-                </div>
-              </button>
+              <div
+                onClick={onsubmit}
+                className="button flex items-center justify-center px-3 h-9 text-lg bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 dark:bg-zinc-800 w-full text-white rounded-full font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+              >
+                Book Now
+              </div>
             </div>
           </div>
         </div>
@@ -394,4 +419,35 @@ const formatDate = (dateString: string) => {
     day: "numeric",
   };
   return new Date(dateString).toLocaleDateString("en-US", options);
+};
+
+
+const ErrMsg = ({ msg = " Wrong Email or Password.", Ismsg }: { msg: String, Ismsg: Function }) => {
+  return (
+      <div className="absolute top-0 right-0 mt-4 mr-4">
+          <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative min-w-52 flex"
+              role="alert"
+          >
+              <strong className="font-semibold">{msg}</strong>
+              <button className="pl-6" onClick={() => {Ismsg(0)}}>
+                  <IconX className="h-4 w-4"/>
+              </button>
+          </div>
+      </div>
+  );
+};
+
+
+const SuccessMsg = ({ msg = "Success!!", Ismsg}: { msg: String, Ismsg: Function}) => {
+  return (
+      <div className="absolute top-0 right-0 mt-4 mr-4">
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex min-w-52" role="alert">
+              <strong className="font-semibold">{msg}</strong>
+              <button className="pl-6" onClick={() => {Ismsg(0)}}>
+                  <IconX className="h-4 w-4"/>
+              </button>
+          </div>
+      </div>
+  );
 };

@@ -44,8 +44,8 @@ export function ResetPasswordForm() {
       const { data } = await axios.post(
         "http://127.0.0.1:5000/api/users/resetPassword",
         {
-          newPassword : password,
-          confirmationToken,
+          "newPassword" : password,
+          "token": confirmationToken
         },
         config
       );

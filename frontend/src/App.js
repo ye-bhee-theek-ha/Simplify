@@ -12,6 +12,7 @@ import {RegisterFlight} from "./screens/RegisterFlight/RegisterFlight"
 import { BrowserRouter } from 'react-router-dom';
 import { LoginAdmin } from "./components/loginAdmin/LoginAdmin"
 import { UpdateFlight } from "./screens/admin/UpdateFlight"
+import { Dashboard } from './screens/Dashboard/Dashboard'
 import Admin from './screens/admin/admin';
 
 import UploadProfileImagePage from "./screens/imgupload"
@@ -33,6 +34,7 @@ function App() {
           <Route path="admin/UpdateFlight/:FlightID" element={<UpdateFlight />}/>
           <Route path="admin/RegisterFlight" element={<RegisterFlight />}/>
           <Route path="admin/" element={<Admin />}/>
+          <Route path="dashboard/" element={<Dashboard />}/>
           <Route path="*" element={<NotFound />}/>
 
           <Route path="/img" element={<UploadProfileImagePage />}/>
