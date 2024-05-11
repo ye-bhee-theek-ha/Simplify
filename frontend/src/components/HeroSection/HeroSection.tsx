@@ -31,8 +31,8 @@ React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
     )}
     {...props}
   >
-    <section className="bg-white dark:bg-gray-900">
-        <div className="h-screen px-4 py-8 mx-auto lg:py-16 flex justify-center">
+    <section className="bg-transparent dark:bg-gray-900">
+        <div className="h-screen px-4 py-8 mx-auto lg:py-16 flex ">
             <div className=" ps-9 place-self-center flex-row">
                 <div>
                     <h1 className="max-w-3xl mb-4 text-6xl md:text-start leading-none dark:text-white">{title}</h1>
@@ -52,7 +52,7 @@ React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
                 </div>
             </div>
             <div className="hidden md:flex items-center ">
-                <img src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png" alt="mockup"/>
+                <img src={require("./../../assets/HeroImages/hero.png")} alt="mockup" className="absolute top-0 left-0 -z-10 w-screen h-screen object-cover"/>
             </div>                
         </div>
     </section>

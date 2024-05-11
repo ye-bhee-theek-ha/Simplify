@@ -9,8 +9,6 @@ const UserReviewsRoutes = require("./routes/UserReviewsRoutes")
 const bookedFlightsRoutes = require("./routes/bookedFlightsRoutes")
 const { NotFound, errHandler } = require("./middlewares/errorMiddleware");
 
-//const uploadToMongo = require('./utils/upload_to_mongo');
-
 
 
 const app = express();

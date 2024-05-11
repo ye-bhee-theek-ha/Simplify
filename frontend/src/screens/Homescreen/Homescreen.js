@@ -10,7 +10,9 @@ function Homescreen() {
 
     <HeroSection
       button1="Lern More"
-      button2="Book Now"  
+      button2="Book Now"
+      route1=""
+      route2="/browseflights"
     />
 
     <KeyFeatures/>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { cn } from "../../utils/cn";
@@ -38,6 +38,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { response } from "express";
+import { Navbar } from "../../components/navbar/navbar";
 
 interface SeatGroup {
   name: string;
@@ -75,6 +76,8 @@ interface FlightData {
 export function FlightInfo() {
   const { getToken, isloggedin } = useAuth();
   const { FlightID } = useParams();
+
+  const navigate = useNavigate();
 
   const [SelectedSeats, SetSelectedSeats] = useState<
     { row: string; col: number; group_name: string }[]
@@ -156,6 +159,8 @@ export function FlightInfo() {
 
   const onsubmit = async () => {
 
+
+
     const data = {
       FlightID: FlightID,
       seats: SelectedSeats
@@ -186,10 +191,11 @@ export function FlightInfo() {
       } catch (error: any) {
         setMessage(error.response.data.message);
         setIsMessage(2)
+        navigate("/login")
       }
     }
   return (
-    <div className="">
+    <div className="flight info">
       {IsMessage == 2 && <ErrMsg msg={message} Ismsg={setIsMessage} />}
       {IsMessage == 1 && <SuccessMsg msg={message} Ismsg={setIsMessage} />}
 

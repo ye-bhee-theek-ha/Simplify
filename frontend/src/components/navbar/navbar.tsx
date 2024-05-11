@@ -38,9 +38,9 @@ export function Navbar({ className }: { className?: string }) {
       )}
     >
       <Menu setActive={setActive}>
-        <div className="title self-center ">
+        <Link className="title self-center " to={"/"}>
           <Title />
-        </div>
+        </Link>
         <div className="content flex space-x-3 flex-1 justify-center self-center">
           <MenuItem setActive={setActive} active={active} item="Services">
             <div className="flex flex-col space-y-4 text-sm">
