@@ -412,55 +412,87 @@ const Bookings = ({ token }: { token: string }) => {
     const [notFound, SetnotFound] = useState(false);
     const [notFoundMsg, SetnotFoundMsg] = useState("");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                SetIsloading(true);
+    const fetchData = async () => {
+        try {
+            SetIsloading(true);
 
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                };
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
 
-                const response = await axios.post(
-                    'http://localhost:5000/api/bookedFlights/getallbyuser',
-                    {
-                        "token": token,
-                    },
-                    config
+            const response = await axios.post(
+                'http://localhost:5000/api/bookedFlights/getallbyuser',
+                {
+                    "token": token,
+                },
+                config
+            );
+
+            const bookingData: Booking[] = response.data.data;
+
+            console.log("booking data")
+            console.log(bookingData)
+
+            // Fetch flight details for each booking
+            const bookingsWithFlightData: Booking[] = [];
+            for (const booking of bookingData) {
+                const flightResponse = await axios.post(
+                    `http://localhost:5000/api/flights/getFlightById/${booking.FlightID}`
                 );
-
-                const bookingData: Booking[] = response.data.data;
-
-                // Fetch flight details for each booking
-                const bookingsWithFlightData: Booking[] = [];
-                for (const booking of bookingData) {
-                    const flightResponse = await axios.post(
-                        `http://localhost:5000/api/flights/getFlightById/${booking.FlightID}`
-                    );
-                    const flightData = flightResponse.data;
-                    const bookingWithFlightData: Booking = { ...booking, flightData };
-                    bookingsWithFlightData.push(bookingWithFlightData);
-                }
-
-                setBookings(bookingsWithFlightData);
-                SetIsloading(false);
-
-            } catch (error: any) {
-                console.error('Error fetching data:', error.response.data.message);
-                SetnotFoundMsg(error.response.data.message);
-                SetnotFound(true);
-                setBookings(null);
-                SetIsloading(false);
+                const flightData = flightResponse.data;
+                const bookingWithFlightData: Booking = { ...booking, flightData };
+                bookingsWithFlightData.push(bookingWithFlightData);
             }
-        };
 
+            setBookings(bookingsWithFlightData);
+            SetIsloading(false);
+
+        } catch (error: any) {
+            console.error('Error fetching data:', error.response.data.message);
+            SetnotFoundMsg(error.response.data.message);
+            SetnotFound(true);
+            setBookings(null);
+            SetIsloading(false);
+        }
+    };
+
+
+    useEffect(() => {
         fetchData();
     }, [token]);
 
     console.log(bookings)
 
+
+    const cancel = async (id:string) => {
+        try {
+            SetIsloading(true);
+
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            const response = await axios.post(
+                'http://localhost:5000/api/bookedFlights/cancel',
+                {
+                    "id": id,
+                },
+                config
+            );
+
+            SetIsloading(false);
+            fetchData();
+            return response
+
+        } catch (error: any) {
+            SetnotFoundMsg(error.response.data.message);
+            SetIsloading(false);
+        }
+    };
     
 
     return (
@@ -477,6 +509,12 @@ const Bookings = ({ token }: { token: string }) => {
                             <div className="flex flex-row">
                                 Seat ID: <p className="font-normal pl-2">{booking.row + booking.col}</p>
                             </div>
+                            <button
+                                className="flex border ml-12 px-2 py-1 border-red-400 bg-red-200 rounded-lg"
+                                onClick={() => {cancel(booking._id)}}
+                            >
+                                Cancel Booking
+                            </button>
                         </div>
                         <DisplayFlights
                             data= {[booking.flightData]}

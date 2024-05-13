@@ -17,7 +17,7 @@ React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
     button2?: string,
     route2?: string} > 
 
-(({ className, title = "HeroSection", discription = "this is a sample discription, lets make it a little longer", button1, route1= "/", button2, route2="/", ...props }, ref) => (
+(({ className, title = "Simplifly", discription = "Let's fly with ease and comfortness", button1, route1= "/", button2, route2="/", ...props }, ref) => (
   <LabelPrimitive.Root
     ref={ref}
     className={cn(

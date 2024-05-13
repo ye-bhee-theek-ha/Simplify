@@ -53,20 +53,20 @@ const getBookedFlightById = asyncHandler(async (req, res) => {
 });
 
 
-// Controller to cancel a booked flight
 const cancelBookedFlight = asyncHandler(async (req, res) => {
-
     const { id } = req.body;
 
-    const bookedFlight = await BookedFlights.findById(id);
+    console.log(id);
 
-    if (!bookedFlight) {
+    const result = await BookedFlights.findOneAndDelete({ _id: id });
+
+    if (!result) {
+        console.log("not found");
         res.status(404).json({
             success: false,
             message: "Booked flight not found"
         });
     } else {
-        await bookedFlight.remove();
         res.status(200).json({
             success: true,
             message: "Booked flight canceled successfully"

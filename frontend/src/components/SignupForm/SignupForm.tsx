@@ -22,6 +22,7 @@ export function SignupForm() {
   const [rePassword, setRePassword] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("Male");
+  const [Card, SetCard] = useState("");
 
   const handleGenderChange = () => {
     if (gender === "Male") {
@@ -189,6 +190,18 @@ export function SignupForm() {
             value={rePassword}
             onChange={(e) => setRePassword(e.target.value)}
             showIcon = {true}
+            required= {true}
+          />
+        </LabelInputContainer>
+        <LabelInputContainer className="mb-1">
+          <Label htmlFor="password">Card Number</Label>
+          <Input
+            id=""
+            placeholder="1234-xxxx-xxxx" 
+            type="text"
+            value={Card}
+            onChange={(e) => SetCard(e.target.value)}
+            showIcon = {false}
             required= {true}
           />
         </LabelInputContainer>

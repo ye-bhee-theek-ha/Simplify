@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import {Navbar} from "../../components/navbar/navbar"
 import { BackgroundBeams } from "../../components/ui/background-beams";
@@ -51,6 +51,7 @@ const Admin = (props) => {
             // Handle error
         }        
     }
+
 
   return (
     <div className='h-screen w-screen'>
