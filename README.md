@@ -1,8 +1,7 @@
 Allows users to view current and past flights, book the flight seats, view recent bookings, cancel them and manage their account.
-(https://github.com/ye-bhee-theek-ha/Simplify/assets/88560890/3748f7cc-f457-4369-a0b7-8263efa6df5a)
-
+[working.webm](https://github.com/ye-bhee-theek-ha/Simplify/assets/88560890/55e6a8f7-467a-497d-9f11-5317ddc55f1f)
 
 
 Allows sellers to register, update and cancel flights.
-https://github.com/ye-bhee-theek-ha/Simplify/assets/88560890/64423c0f-b3d8-4ad8-827c-762a13e295d7
+[admin.webm](https://github.com/ye-bhee-theek-ha/Simplify/assets/88560890/bdf21fdc-a8c1-4b0f-bdf5-ab58cf2b0cc3)
 
