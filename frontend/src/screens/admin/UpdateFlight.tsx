@@ -191,7 +191,6 @@ export const UpdateFlight = () => {
                         <Label htmlFor="FlightType" className="font-semibold text-neutral-800 dark:text-neutral-200">Flight Type:</Label>
                         <Btn text={type} onClick={handletypeChange} />
                     </div>
-                    
                 </div>
                 
                 <div className='grid grid-cols-4 mt-3 gap-4'>
