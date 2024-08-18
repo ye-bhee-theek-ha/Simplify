@@ -15,7 +15,6 @@ import UploadProfileImage from "../imgupload";
 import {
     IconX
 } from "@tabler/icons-react";
-import { set } from "mongoose";
 import { DisplayFlights } from "../../components/DisplayList/DisplayList";
 import { Loading } from "../../components/Loading/Loading";
 
