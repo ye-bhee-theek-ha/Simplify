@@ -75,3 +75,4 @@ to create a new component
 
 
 ### npx tsc --init
+### also downgrade typescript to 4.x

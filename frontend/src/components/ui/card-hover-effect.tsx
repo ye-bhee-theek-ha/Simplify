@@ -18,33 +18,40 @@ export const HoverEffect = ({
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  return components.map((component, idx) => (
+  return (
+    <>
+      {components.map((component, idx) => (
         <div
           key={idx}
           className={cn(
-            "gridItemsWshadow relative group grid p-2 h-full w-full", component.className
-            )}
+            "gridItemsWshadow relative group grid p-2 h-full w-full",
+            component.className
+          )}
           onMouseEnter={() => setHoveredIndex(idx)}
-          onMouseLeave={() => setHoveredIndex(idx)}
+          onMouseLeave={() => setHoveredIndex(null)}
         >
-          <AnimatePresence>
-            {hoveredIndex === idx && (
-              <motion.span
-                className="-z-10 absolute inset-0 h-full w-full bg-neutral-200 dark:bg-slate-800/[0.8] block rounded-3xl"
-                layoutId="hoverBackground"
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  transition: { duration: 0.15 },
-                }}
-                exit={{
-                  opacity: 0,
-                  transition: { duration: 0.15, delay: 0.2 },
-                }}
-              />
-            )}
-          </AnimatePresence>
+{/* <AnimatePresence initial={false}>
+  {hoveredIndex === idx && (
+    <motion.span
+      className="-z-10 absolute inset-0 h-full w-full bg-neutral-200 dark:bg-slate-800/[0.8] block rounded-3xl"
+      layoutId="hoverBackground"
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: 1,
+        transition: { duration: 0.15 },
+      }}
+      exit={{
+        opacity: 0,
+        transition: { duration: 0.15, delay: 0.2 },
+      }}
+    />
+  )}
+</AnimatePresence> */}
+
           {component.component}
         </div>
-      ))};
+      ))}
+    </>
+  );
+};
 
